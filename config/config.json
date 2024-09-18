@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "root",
+    "password": "03203024514",
+    "database": "constructiondb",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "root",
+    "password": "03203024514",
+    "database": "constructiondb_test",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": "03203024514",
+    "database": "constructiondb_production",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}

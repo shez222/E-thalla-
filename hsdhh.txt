@@ -1,0 +1,49 @@
+Model Instance Methods
+
+save: Saves the instance to the database.
+destroy: Deletes the instance from the database.
+reload: Reloads the instance from the database.
+update: Updates the instance's attributes.
+Model Methods
+create: Creates a new instance and saves it to the database.
+findByPk: Finds an instance by its primary key.
+findOne: Finds a single instance matching the specified criteria.
+findAll: Finds multiple instances matching the specified criteria.
+findOrCreate: Finds an instance, or creates it if it doesn’t exist.
+findAndCountAll: Finds multiple instances and returns a count of matching records.
+count: Counts the number of instances matching the specified criteria.
+destroy: Deletes instances that match the specified criteria.
+update: Updates instances that match the specified criteria.
+max: Finds the maximum value of a specified field.
+min: Finds the minimum value of a specified field.
+sum: Calculates the sum of a specified field.
+avg: Calculates the average of a specified field.
+
+
+Querying Methods
+
+where: Specifies the conditions for a query (used within methods like findOne, findAll, etc.).
+include: Eager loads associated models.
+order: Specifies the order of the results.
+limit: Limits the number of results returned.
+offset: Skips a number of results (used for pagination).
+attributes: Specifies which attributes to include or exclude in the results.
+group: Groups results based on a specified field (often used with aggregation functions like sum, avg).
+
+
+Transaction Methods
+
+transaction: Starts a new transaction.
+commit: Commits the current transaction.
+rollback: Rolls back the current transaction.
+Association Methods
+hasMany: Defines a one-to-many relationship.
+belongsTo: Defines a many-to-one relationship.
+belongsToMany: Defines a many-to-many relationship.
+hasOne: Defines a one-to-one relationship.
+
+
+Model Definition Methods
+
+init: Initializes the model with schema and options.
+sync: Creates or updates the table in the database based on the model definition
