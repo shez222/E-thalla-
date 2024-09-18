@@ -21,7 +21,7 @@ module.exports = (sequelize,DataTypes)=>{
             allowNull: false,
             primaryKey: true
         },
-        quantity: Sequelize.INTEGER
+        quantity: DataTypes.INTEGER
     
     })
     CartItem.associate = function(models) {

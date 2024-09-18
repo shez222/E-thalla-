@@ -4,7 +4,8 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto')
 const  { sendEmail } = require('../utils/sendmail')
 const {forgotdata, otpdata} = require('../utils/otp&forgotmsg')
-const MultiUser = require('../models/User');
+const db = require('../models');
+const MultiUser = db.User
 
 
 const MultiuserRegister = async (req, res) => {
@@ -24,7 +25,7 @@ const MultiuserRegister = async (req, res) => {
         const newUser = await MultiUser.create({
             userName: username,
             password: hashedpw,
-            Email: email,
+            email: email,
             currentRole: [{ 'role': 'user' }] // Default role assigned as 'user'
         });
         return res.json({
