@@ -1,4 +1,5 @@
-const Product = require('../models/product');
+const db = require('../models');
+const Product = db.Product;
 // const path = require('path');
 
 const fs = require('fs');
@@ -10,6 +11,8 @@ const postAddProducts = async (req, res, next) => {
     if (!req.file) {
         return res.status(422).json({msg:"Error Uploading image"})
     }    
+    console.log(req.user);
+    
     try {
         const result = await req.user.createProduct({
             title,

@@ -1,7 +1,7 @@
 {
   "development": {
     "username": "root",
-    "password": "03203024514",
+    "password": null,
     "database": "constructiondb",
     "host": "127.0.0.1",
     "dialect": "mysql"

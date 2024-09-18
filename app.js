@@ -8,6 +8,8 @@ const { v4: uuidv4 } = require('uuid');
 const MultiUseruserRoutes = require('./routes/multiUserROutes');
 const adminRoutes = require('./routes/VendorRoute');
 const shopRoutes = require('./routes/UserShopROutes');
+const db = require('./models')
+const User = db.User
 
 // // Import models
 // const Product = require('./models/product');
@@ -56,19 +58,19 @@ app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image')
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 // Middleware to attach user to request
-// app.use((req, res, next) => {
-//     User.findByPk(2)
-//         .then(user => {
-//             req.user = user;
-//             // console.log(req.user);
+app.use((req, res, next) => {
+    User.findByPk(1)
+        .then(user => {
+            req.user = user;
+            // console.log(req.user);
             
-//             next();
-//         })
-//         .catch(err => {
-//             console.log(err);
-//             res.status(500).json({ error: 'Internal server error' });
-//         });
-// });
+            next();
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({ error: 'Internal server error' });
+        });
+});
 
 // Routes
 app.use('/E-Thalla', MultiUseruserRoutes);

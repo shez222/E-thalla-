@@ -1,7 +1,7 @@
 const { where } = require('sequelize');
-const Cart = require('../models/cart');
-const Product = require('../models/product');
-
+const db = require('../models');
+const Product = db.Product
+const Cart = db.Cart
 const getProducts = async (req, res, next) => {
     try {
         const products = await Product.findAll();
@@ -35,7 +35,7 @@ const getCart = async (req, res, next) => {
         console.log("uyhuaifdyiyh",req.user.dataValues.multiUserId);
         // console.log(req.user);
         
-        const cartCheck = await Cart.findOne({where: {UserMultiUserId: req.user.dataValues.multiUserId}})
+        const cartCheck = await Cart.findOne({where: {userId: req.user.dataValues.multiUserId}})
         if (!cartCheck) {
           await req.user.createCart() 
         }
@@ -58,7 +58,7 @@ const postCart = async (req, res, next) => {
     let newQuantity = 1;
 
     try {
-        const cartCheck = await Cart.findOne({where: {UserMultiUserId: req.user.dataValues.multiUserId}})
+        const cartCheck = await Cart.findOne({where: {userId: req.user.dataValues.multiUserId}})
         if (!cartCheck) {
           await req.user.createCart() 
         }
@@ -77,7 +77,7 @@ const postCart = async (req, res, next) => {
         if (product) {
             console.log('Product',product);
             
-            const oldQuantity = product.CartItems.quantity;
+            const oldQuantity = product.CartItem.quantity;
             newQuantity = oldQuantity + 1;
         } else {
             product = await Product.findByPk(prodId);
@@ -104,14 +104,14 @@ const postDeleteCartProduct = async (req, res, next) => {
 
         const product = products[0];
 
-        if (product.CartItems.quantity > 1) {
+        if (product.CartItem.quantity > 1) {
             // Decrement the quantity by 1
-            product.CartItems.quantity -= 1;
-            await product.CartItems.save();
+            product.CartItem.quantity -= 1;
+            await product.CartItem.save();
             res.json({ message: 'Product quantity decreased by 1' });
         } else {
             // Quantity is 1, so remove the product from the cart
-            await product.CartItems.destroy();
+            await product.CartItem.destroy();
             res.json({ message: 'Product removed from cart' });
         }
     } catch (err) {
@@ -130,12 +130,15 @@ const postOrder = async (req, res, next) => {
            return res.json({message:"Cart is Empty Add something to cart"})
         }
         const order = await req.user.createOrder();
+        
         await order.addProducts(
             products.map(product => {
-                product.orderItem = { quantity: product.CartItems.quantity };
+                product.OrderItem = { quantity: product.CartItem.quantity };
                 return product;
             })
         );
+        console.log(order);
+
 
         await cart.setProducts(null);
         res.json({ message: 'Order placed successfully' });
