@@ -1,95 +1,53 @@
 const express = require('express');
 const path = require('path');
-const sequelize = require('./utils/db');
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 
 // Import routes
-const MultiUseruserRoutes = require('./routes/multiUserROutes');
+const MultiUseruserRoutes = require('./routes/multiUserRoutes');
 const adminRoutes = require('./routes/VendorRoute');
-const shopRoutes = require('./routes/UserShopROutes');
-const db = require('./models')
-const User = db.User
+const shopRoutes = require('./routes/ShopRoutes');
+const serviceProviderRoutes = require('./routes/ServiceProviderRoute'); // Add this line
+const db = require('./models');
+const User = db.User;
 
-// // Import models
-// const Product = require('./models/product');
-// const Location = require('./models/Location');
-// const User = require('./models/User');
-// const Cart = require('./models/cart');
-// const CartItem = require('./models/cart-item');
-// const Order = require('./models/order');
-// const OrderItem = require('./models/order-item');
-
-// // Define associations
-// Location.belongsTo(User, { onDelete: 'CASCADE' });
-// Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
-// Order.belongsTo(User);
-
-// User.hasOne(Cart);
-// User.hasMany(Product);
-// User.hasMany(Order);
-// Cart.belongsToMany(Product, { through: CartItem });
-// Product.belongsToMany(Cart, { through: CartItem });
-// Product.belongsToMany(Order, { through: OrderItem });
-// Order.belongsToMany(Product, { through: OrderItem });
-
+// Initialize Express app
 const app = express();
 
-// Multer configuration
-const fileStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'images');
-    },
-    filename: function (req, file, cb) {
-        const uniqueFilename = `${uuidv4()}.${file.originalname.split('.').pop()}`;
-        cb(null, uniqueFilename);
-    }
-});
-
-const fileFilter = (req, file, cb) => {
-    if (file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg') {
-        cb(null, true);
-    } else {
-        cb(null, false);
-    }
-};
-
-app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'));
-app.use('/images', express.static(path.join(__dirname, 'images')));
+// // Middleware to parse JSON and URL-encoded data
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
+// const storage = multer.memoryStorage(); // Using memory storage since we're not handling files
+// app.use(multer({ storage: storage }).any())
 
 // Middleware to attach user to request
-app.use((req, res, next) => {
-    User.findByPk(1)
-        .then(user => {
-            req.user = user;
-            // console.log(req.user);
-            
-            next();
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).json({ error: 'Internal server error' });
-        });
+app.use(async (req, res, next) => {
+    try {
+        const user = await User.findByPk(1);
+        req.user = user;
+        next();
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 });
 
-// Routes
+// Routes without file uploads
 app.use('/E-Thalla', MultiUseruserRoutes);
-app.use('/Vendors', adminRoutes);
 app.use('/Shop', shopRoutes);
+app.use('/service-provider-details', serviceProviderRoutes); // Add this line
 
-// Sync database and start server
-// sequelize.sync({force: true})  // Use {force: true} only in development if you want to drop and recreate tables
-//     .then(() => {
-//         console.log("Connected to the database");
-//         app.listen(3000, () => {
-//             console.log('Listening on port 3000');
-//         });
-//     })
-//     .catch(error => {
-//         console.log(error);
-//     });
+// Routes with file uploads will be handled in their respective route files
+app.use('/Vendors', adminRoutes);
 
+// Error Handling Middleware (Optional)
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+});
+
+// Start the Server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });

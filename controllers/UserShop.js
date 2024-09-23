@@ -2,6 +2,12 @@ const { where } = require('sequelize');
 const db = require('../models');
 const Product = db.Product
 const Cart = db.Cart
+const User = db.User
+
+const bcrypt = require('bcrypt');
+
+
+
 const getProducts = async (req, res, next) => {
     try {
         const products = await Product.findAll();
@@ -32,15 +38,18 @@ const getProduct = async (req, res, next) => {
 const getCart = async (req, res, next) => {
     try {
         // await req.user.createCart()
+        const userId = req.body.userId
         console.log("uyhuaifdyiyh",req.user.dataValues.multiUserId);
         // console.log(req.user);
         
-        const cartCheck = await Cart.findOne({where: {userId: req.user.dataValues.multiUserId}})
+        // const cartCheck = await Cart.findOne({where: {userId: req.user.dataValues.multiUserId}})
+        const user = await User.findOne({ where: {multiUserId: userId} })
+        const cartCheck = await Cart.findOne({where: {userId: userId}})
         if (!cartCheck) {
-          await req.user.createCart() 
+          await user.createCart() 
         }
         
-        const cart = await req.user.getCart();
+        const cart = await user.getCart();
         const products = await cart.getProducts();
         if (!products) {
             return res.json("Cart is Empty")
@@ -54,17 +63,20 @@ const getCart = async (req, res, next) => {
 
 const postCart = async (req, res, next) => {
     const prodId = req.body.productId;
+    const userId = req.body.userId
     let fetchCart;
     let newQuantity = 1;
 
     try {
-        const cartCheck = await Cart.findOne({where: {userId: req.user.dataValues.multiUserId}})
+        const user = await User.findOne({ where : { multiUserId: userId}})
+        const cartCheck = await Cart.findOne({where: {userId: userId }})
+        // const cartCheck = await Cart.findOne({where: {userId: req.user.dataValues.multiUserId}})
         if (!cartCheck) {
-          await req.user.createCart() 
+          await user.createCart() 
         }
         console.log("hgckh");
         
-        const cart = await req.user.getCart();
+        const cart = await user.getCart();
         fetchCart = cart;
         const products = await cart.getProducts({ where: { id: prodId } });
         
@@ -93,9 +105,11 @@ const postCart = async (req, res, next) => {
 
 const postDeleteCartProduct = async (req, res, next) => {
     const prodId = req.body.productId;
+    const userId = req.body.userId
 
     try {
-        const cart = await req.user.getCart();
+        const user = await User.findOne({ where : { multiUserId: userId}})
+        const cart = await user.getCart();
         const products = await cart.getProducts({ where: { id: prodId } });
 
         if (!products.length) {
@@ -121,15 +135,17 @@ const postDeleteCartProduct = async (req, res, next) => {
 };
 
 const postOrder = async (req, res, next) => {
+    const userId = req.body.userId
     try {
-        const cart = await req.user.getCart();
+        const user = await User.findOne({ where : { multiUserId: userId}})
+        const cart = await user.getCart();
         const products = await cart.getProducts();
         console.log(products.length);
         
         if (products.length < 1) {
            return res.json({message:"Cart is Empty Add something to cart"})
         }
-        const order = await req.user.createOrder();
+        const order = await user.createOrder();
         
         await order.addProducts(
             products.map(product => {
@@ -150,12 +166,16 @@ const postOrder = async (req, res, next) => {
 
 const getOrders = async (req, res, next) => {
     try {
-        const orders = await req.user.getOrders({ include: ['Products'] });
+        const userId = req.params.userId
+        const user = await User.findOne({ where : { multiUserId: userId}})
+        const orders = await user.getOrders({ include: ['Products'] });
         res.json({ orders });
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: 'Failed to retrieve orders' });
     }
 };
+
+
 
 module.exports = { getProducts, getProduct, getCart, postCart, postDeleteCartProduct, postOrder, getOrders }

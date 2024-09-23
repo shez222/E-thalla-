@@ -1,3 +1,72 @@
+// models/vendorDetail.js
+
+module.exports = (sequelize, DataTypes) => {    
+    const VendorDetail = sequelize.define('VendorDetail', {
+        vendorId: {
+            type: DataTypes.INTEGER,
+            autoIncrement: true,
+            allowNull: true,
+            primaryKey: true
+        },
+        phoneNumber: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        description: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        selectedItems: {
+            type: DataTypes.JSON,
+            allowNull: false
+        },
+        priceRange: {
+            type: DataTypes.JSON,
+            allowNull: false
+        },
+        timeSelection: {
+            type: DataTypes.JSON,
+            allowNull: false
+        },
+        selectedDays: {
+            type: DataTypes.JSON,
+            allowNull: true,
+            defaultValue: []
+        },
+        uploadImages: {
+            type: DataTypes.JSON,
+            allowNull: true,
+            defaultValue: {
+                images: [],
+                certificateImages: []
+            }
+        },
+        createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW
+        },
+        updatedAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW
+        }
+    });
+        
+    VendorDetail.associate = function(models) {
+        // Define associations here
+        VendorDetail.belongsTo(models.User, {
+            foreignKey: 'userId',
+            as: 'user'
+        });
+    };
+    return VendorDetail;
+};
+
+
+
+
+
 // const Sequelize = require('sequelize');
 // const sequelizeDbConnect = require('../utils/db');
 
@@ -43,54 +112,54 @@
 
 // module.exports = VendorDetail;
 
-module.exports=(sequelize,DataTypes)=>{    
-    const VendorDetail = sequelize.define('VendorDetail', {
-        vendorId: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            primaryKey: true
-        },
-        name: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        company: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        experience: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        specialization: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        availability: {
-            type: DataTypes.JSON,
-            allowNull: false
-        },
-        previousWork: {
-            type: DataTypes.JSON,
-            allowNull: true
-        },
-        certifications: {
-            type: DataTypes.JSON,
-            allowNull: true
-        },
-        contactInfo: {
-            type: DataTypes.JSON,
-            allowNull: false
-        }
-        });
+// module.exports=(sequelize,DataTypes)=>{    
+//     const VendorDetail = sequelize.define('VendorDetail', {
+//         vendorId: {
+//             type: DataTypes.STRING,
+//             allowNull: false,
+//             primaryKey: true
+//         },
+//         name: {
+//             type: DataTypes.STRING,
+//             allowNull: false
+//         },
+//         company: {
+//             type: DataTypes.STRING,
+//             allowNull: false
+//         },
+//         experience: {
+//             type: DataTypes.STRING,
+//             allowNull: false
+//         },
+//         specialization: {
+//             type: DataTypes.STRING,
+//             allowNull: false
+//         },
+//         availability: {
+//             type: DataTypes.JSON,
+//             allowNull: false
+//         },
+//         previousWork: {
+//             type: DataTypes.JSON,
+//             allowNull: true
+//         },
+//         certifications: {
+//             type: DataTypes.JSON,
+//             allowNull: true
+//         },
+//         contactInfo: {
+//             type: DataTypes.JSON,
+//             allowNull: false
+//         }
+//         });
         
-        VendorDetail.associate = function(models) {
-        // Define associations here if needed
-        VendorDetail.belongsTo(models.User, {
-            foreignKey: 'userId',
-            as: 'user'
-          });
-        };
+//         VendorDetail.associate = function(models) {
+//         // Define associations here if needed
+//         VendorDetail.belongsTo(models.User, {
+//             foreignKey: 'userId',
+//             as: 'user'
+//           });
+//         };
 
-        return VendorDetail;
-}
+//         return VendorDetail;
+// }

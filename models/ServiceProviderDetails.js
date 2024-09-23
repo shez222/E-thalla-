@@ -54,16 +54,18 @@ module.exports = (sequelize,DataTypes)=> {
         },
         previousWorkImages: {
           type: DataTypes.JSON,
-          allowNull: true
+          allowNull: true,
+          defaultValue: []
         },
         certificateImages: {
           type: DataTypes.JSON,
-          allowNull: true
+          allowNull: true,
+          defaultValue: []
+          
         }
       });
       
       ServiceProviderDetail.associate = function(models) {
-        // Define associations here if needed
         ServiceProviderDetail.belongsTo(models.User, {
           foreignKey: 'userId',
           as: 'user'

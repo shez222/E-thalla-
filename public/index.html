@@ -1,0 +1,38 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiple Image Upload</title>
+</head>
+<body>
+    <h1>Upload Multiple Images</h1>
+    <form action="http://localhost:3000/upload" method="POST" enctype="multipart/form-data">
+        <input type="file" name="images" multiple required>
+        <button type="submit">Upload Images</button>
+    </form>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Images</title>
+</head>
+<body>
+    <h1>Upload Three Images</h1>
+    <form action="http://localhost:3000/upload" method="POST" enctype="multipart/form-data">
+        <label for="image1">Image 1:</label>
+        <input type="file" name="image1" required><br><br>
+
+        <label for="image2">Image 2:</label>
+        <input type="file" name="image2" required><br><br>
+
+        <label for="image3">Image 3:</label>
+        <input type="file" name="image3" required><br><br>
+
+        <button type="submit">Upload Images</button>
+    </form>
+</body>
+</html>

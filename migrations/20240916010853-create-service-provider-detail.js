@@ -23,11 +23,15 @@ module.exports = {
       },
       previousWorkImages: {
         type: Sequelize.JSON,
-        allowNull: true
+        allowNull: true,
+        defaultValue: []
+
       },
       certificateImages: {
         type: Sequelize.JSON,
-        allowNull: true
+        allowNull: true,
+        defaultValue: []
+
       },
       createdAt: {
         type: Sequelize.DATE,

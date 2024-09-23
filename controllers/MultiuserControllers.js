@@ -10,9 +10,11 @@ const MultiUser = db.User
 
 const MultiuserRegister = async (req, res) => {
     const { email, username, password, confirmpassword,role} = req.body;
+    console.log(email);
+    
     
     try {
-        const user = await MultiUser.findOne({ where: { Email: email } });
+        const user = await MultiUser.findOne({ where: { email: email } });
         if (user) {
             return res.json({ error: "User already registered. Please login." });
         }
@@ -48,7 +50,7 @@ const MultiuserLogin = async (req, res, next) => {
 
     try {
         const user = await MultiUser.findOne({
-            where: { Email: email }
+            where: { email: email }
         });
 
         if (!user) {
@@ -233,5 +235,83 @@ const setNewPassword = async (req, res) => {
         });
     }
 }
-module.exports = {MultiuserRegister, MultiuserLogin, matchOtp, forgotPassword, verifyForgetCode, setNewPassword}
+
+
+// Get all users
+const getAllUsers = async (req, res) => {
+    try {
+        const users = await MultiUser.findAll({
+            attributes: ['multiUserId', 'username', 'email'] // Specify the fields you want to return
+        });
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching users', error: error.message });
+    }
+};
+
+
+// Get a user by ID
+const getUserById = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const user = await MultiUser.findOne({ where: { multiUserId: userId } });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching user', error: error.message });
+    }
+};
+
+// Update a user by ID
+const updateUser = async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const { password, email, userName, currentRole, cnic, profilePicture, mobileNumber } = req.body;
+
+        const user = await MultiUser.findOne({ where: { multiUserId: userId } });
+        
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // user.email = email || user.email;
+        user.userName = userName;
+        // user.currentRole = currentRole || user.currentRole;
+        // user.cnic = cnic || user.cnic;
+        // user.profilePicture = profilePicture || user.profilePicture;
+        // user.mobileNumber = mobileNumber || user.mobileNumber;
+
+        await user.save();
+
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating user', error: error.message });
+    }
+};
+
+// Delete a user by ID
+const deleteUser = async (req, res) => {
+    try {
+        const userId = req.params.id;
+
+        const user = await MultiUser.findOne({ where: { multiUserId: userId } });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        await user.destroy();
+
+        res.status(200).json({ message: 'User deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting user', error: error.message });
+    }
+};
+
+
+module.exports = {MultiuserRegister, MultiuserLogin, matchOtp, forgotPassword, verifyForgetCode, setNewPassword, getAllUsers, getUserById,deleteUser, updateUser}
 
