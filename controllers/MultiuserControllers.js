@@ -7,41 +7,114 @@ const {forgotdata, otpdata} = require('../utils/otp&forgotmsg')
 const db = require('../models');
 const MultiUser = db.User
 
-
 const MultiuserRegister = async (req, res) => {
-    const { email, username, password, confirmpassword,role} = req.body;
-    console.log(email);
-    
-    
+    const { email, username, password, confirmpassword, role } = req.body;
+
     try {
-        const user = await MultiUser.findOne({ where: { email: email } });
-        if (user) {
-            return res.json({ error: "User already registered. Please login." });
-        }
+        // Ensure 'user' role is always present, regardless of what role is provided
+        const assignedRole = role && role !== 'user' ? ['user', role] : ['user'];
 
+        // Check if passwords match
         if (password !== confirmpassword) {
-            res.status(422).json("password not matched")
+            return res.status(422).json({ success: false, error: 'Passwords do not match' });
         }
 
+        // Find user by email
+        const user = await MultiUser.findOne({ where: { Email: email } });
+
+        // If user exists, check if the role is already assigned
+        if (user) {
+            // Check if provided password matches the stored password
+            const isEqual = await bcrypt.compare(password, user.password);
+            if (!isEqual) {
+                return res.status(400).json({ success: false, error: "Email already exists" });
+            }
+
+            // Find the roles already assigned to the user
+            const currentRoles = user.currentRole;
+
+            // Add any missing roles (either 'user' or the assigned role)
+            const rolesToAdd = assignedRole.filter(role => !currentRoles.includes(role));
+
+            // If all roles are already assigned, respond with an error
+            if (rolesToAdd.length === 0) {
+                return res.status(422).json({ success: false, error: `All selected roles are already assigned to this email` });
+            }
+
+            // Update the user by adding the new roles
+            const updatedUser = await user.update({
+                currentRole: [...currentRoles, ...rolesToAdd]
+            });
+
+            return res.json({
+                success: true,
+                user: updatedUser,
+                msg: `Roles "${rolesToAdd.join(', ')}" added to user`
+            });
+        }
+
+        // If user doesn't exist, create a new user with both 'user' and the assigned role
         const hashedpw = await bcrypt.hash(password, 12);
+
         const newUser = await MultiUser.create({
             userName: username,
             password: hashedpw,
             email: email,
-            currentRole: [{ 'role': 'user' }] // Default role assigned as 'user'
+            currentRole: assignedRole
         });
+
+        // Send registration email
+        await sendEmail(email, "Registration Successful", "Welcome to E-Thalla!");
+
+        // Respond with success message
         return res.json({
+            success: true,
             user: newUser,
-            msg: `Successfully created user with default role 'user'`
+            msg: `User created successfully with roles "${assignedRole.join(', ')}"`
         });
 
     } catch (error) {
-        if (!error.status) {
-            error.status = 500;
-        }
-        res.status(error.status).json({ error: error.message });
+        // Handle errors with a default 500 status if not set
+        const status = error.status || 500;
+        res.status(status).json({ success: false, error: error.message });
     }
 };
+
+
+// const MultiuserRegister = async (req, res) => {
+//     const { email, username, password, confirmpassword,role} = req.body;
+//     console.log(email);
+    
+    
+//     try {
+//         const user = await MultiUser.findOne({ where: { email: email } });
+//         if (user) {
+//             return res.json({ error: "User already registered. Please login." });
+//         }
+
+//         if (password !== confirmpassword) {
+//             res.status(422).json("password not matched")
+//         }
+
+//         const hashedpw = await bcrypt.hash(password, 12);
+//         const newUser = await MultiUser.create({
+//             userName: username,
+//             password: hashedpw,
+//             email: email,
+//             currentRole: [{ 'role': 'user' }] // Default role assigned as 'user'
+//         });
+//         return res.json({
+//             user: newUser,
+//             msg: `Successfully created user with default role 'user'`
+//         });
+
+//     } catch (error) {
+//         if (!error.status) {
+//             error.status = 500;
+//         }
+//         res.status(error.status).json({ error: error.message });
+//     }
+// };
 
 
 

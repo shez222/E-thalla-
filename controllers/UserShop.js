@@ -63,40 +63,54 @@ const getCart = async (req, res, next) => {
 
 const postCart = async (req, res, next) => {
     const prodId = req.body.productId;
-    const userId = req.body.userId
+    const userId = req.body.userId;
     let fetchCart;
     let newQuantity = 1;
 
     try {
-        const user = await User.findOne({ where : { multiUserId: userId}})
-        const cartCheck = await Cart.findOne({where: {userId: userId }})
-        // const cartCheck = await Cart.findOne({where: {userId: req.user.dataValues.multiUserId}})
-        if (!cartCheck) {
-          await user.createCart() 
+        // Check if user exists
+        const user = await User.findOne({ where: { multiUserId: userId }});
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
         }
-        console.log("hgckh");
-        
+
+        // Check if the user has a cart, if not create one
+        let cartCheck = await Cart.findOne({ where: { userId: userId }});
+        if (!cartCheck) {
+            await user.createCart(); 
+        }
+
+        // Get the cart
         const cart = await user.getCart();
         fetchCart = cart;
-        const products = await cart.getProducts({ where: { id: prodId } });
-        
 
+        // Check if the product exists in the cart
+        const products = await cart.getProducts({ where: { id: prodId } });
         let product;
         if (products.length > 0) {
             product = products[0];
         }
 
+        // If product is already in the cart, increase the quantity
         if (product) {
-            console.log('Product',product);
-            
             const oldQuantity = product.CartItem.quantity;
             newQuantity = oldQuantity + 1;
         } else {
+            // Fetch product by ID to add to the cart
             product = await Product.findByPk(prodId);
+
+            // If no product exists for the given prodId
+            if (!product) {
+                return res.status(404).json({ message: 'Product not found' });
+            }
         }
 
+        // Add the product to the cart or update quantity
         await fetchCart.addProduct(product, { through: { quantity: newQuantity } });
+
+        // Send success response
         res.json({ message: 'Product added to cart' });
+
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: 'Failed to add product to cart' });
