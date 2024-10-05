@@ -11,10 +11,8 @@ const MultiuserRegister = async (req, res) => {
     const { email, username, password, confirmpassword, role } = req.body;
 
     try {
-        // Ensure 'user' role is always present, regardless of what role is provided
         const assignedRole = role && role !== 'user' ? ['user', role] : ['user'];
 
-        // Check if passwords match
         if (password !== confirmpassword) {
             return res.status(422).json({ success: false, error: 'Passwords do not match' });
         }
@@ -22,26 +20,20 @@ const MultiuserRegister = async (req, res) => {
         // Find user by email
         const user = await MultiUser.findOne({ where: { Email: email } });
 
-        // If user exists, check if the role is already assigned
         if (user) {
-            // Check if provided password matches the stored password
             const isEqual = await bcrypt.compare(password, user.password);
             if (!isEqual) {
                 return res.status(400).json({ success: false, error: "Email already exists" });
             }
 
-            // Find the roles already assigned to the user
             const currentRoles = user.currentRole;
 
-            // Add any missing roles (either 'user' or the assigned role)
             const rolesToAdd = assignedRole.filter(role => !currentRoles.includes(role));
 
-            // If all roles are already assigned, respond with an error
             if (rolesToAdd.length === 0) {
                 return res.status(422).json({ success: false, error: `All selected roles are already assigned to this email` });
             }
 
-            // Update the user by adding the new roles
             const updatedUser = await user.update({
                 currentRole: [...currentRoles, ...rolesToAdd]
             });
@@ -53,7 +45,6 @@ const MultiuserRegister = async (req, res) => {
             });
         }
 
-        // If user doesn't exist, create a new user with both 'user' and the assigned role
         const hashedpw = await bcrypt.hash(password, 12);
 
         const newUser = await MultiUser.create({
@@ -63,10 +54,8 @@ const MultiuserRegister = async (req, res) => {
             currentRole: assignedRole
         });
 
-        // Send registration email
         await sendEmail(email, "Registration Successful", "Welcome to E-Thalla!");
 
-        // Respond with success message
         return res.json({
             success: true,
             user: newUser,
@@ -74,7 +63,6 @@ const MultiuserRegister = async (req, res) => {
         });
 
     } catch (error) {
-        // Handle errors with a default 500 status if not set
         const status = error.status || 500;
         res.status(status).json({ success: false, error: error.message });
     }
