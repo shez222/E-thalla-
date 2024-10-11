@@ -39,18 +39,14 @@ const upload = multer({ storage: fileStorage, fileFilter: fileFilter });
 // Create a new product with multiple images
 router.post(
     '/add-product',
-    upload.fields([
-        { name: 'images', maxCount: 10 }, // This should match the field name in your request
-    ]),
+    upload.fields([{ name: 'images', maxCount: 10 }]),
     adminController.postAddProducts
 );
 
 // Edit a product with multiple images
 router.post(
     '/edit-product',
-    upload.fields([
-        { name: 'images', maxCount: 10 }, // This should match the field name in your request
-    ]),
+    upload.fields([{ name: 'images', maxCount: 10 }]),
     adminController.postEditProducts
 );
 
@@ -61,7 +57,7 @@ router.get('/products', adminController.getProducts);
 router.get('/edit-product/:productId', adminController.getEditProducts);
 
 // Delete a product
-router.post('/delete-product',upload.none(), adminController.postDeleteProduct);
+router.post('/delete-product', upload.none(), adminController.postDeleteProduct);
 
 // ------------------- VendorDetail Routes -------------------
 
@@ -79,11 +75,11 @@ router.post(
 router.get('/all-vendor', adminController.getAllVendorDetails);
 
 // Get a single VendorDetail by vendorId
-router.get('/:vendorId', adminController.getVendorDetailById);
+router.get('/detail/:vendorId', adminController.getVendorDetailById);
 
 // Update a VendorDetail by vendorId with multiple images
 router.put(
-    '/:vendorId',
+    '/detail-update/:vendorId',
     upload.fields([
         { name: 'images', maxCount: 10 },
         { name: 'certificateImages', maxCount: 5 }
@@ -92,6 +88,31 @@ router.put(
 );
 
 // Delete a VendorDetail by vendorId
-router.delete('/:vendorId',upload.none(), adminController.deleteVendorDetail);
+router.delete('/:vendorId', upload.none(), adminController.deleteVendorDetail);
+
+// ------------------- Shop Routes -------------------
+
+// Create a new shop
+router.post(
+    '/create-shop',
+    upload.single('image'), // Assuming only one image for shop
+    adminController.createShop
+);
+
+// Get all shops
+router.get('/shops', adminController.getShops);
+
+// Get a specific shop by ID
+router.get('/shop/:shopId', adminController.getShopById);
+
+// Update a shop by ID
+router.put(
+    '/shop/:shopId',
+    upload.single('image'), // Assuming only one image for shop
+    adminController.updateShop
+);
+
+// Delete a shop by ID
+router.delete('/shop/:shopId', upload.none(), adminController.deleteShop);
 
 module.exports = router;

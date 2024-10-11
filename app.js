@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 
 // Import routes
 const MultiUseruserRoutes = require('./routes/multiUserRoutes');
-const adminRoutes = require('./routes/VendorRoute');
+const vendorRoutes = require('./routes/VendorRoute');
 const shopRoutes = require('./routes/ShopRoutes');
 const serviceProviderRoutes = require('./routes/ServiceProviderRoute'); // Add this line
 const db = require('./models');
@@ -38,7 +38,7 @@ app.use('/Shop', shopRoutes);
 app.use('/service-provider-details', serviceProviderRoutes); // Add this line
 
 // Routes with file uploads will be handled in their respective route files
-app.use('/Vendors', adminRoutes);
+app.use('/Vendors', vendorRoutes);
 
 // Error Handling Middleware (Optional)
 app.use((err, req, res, next) => {

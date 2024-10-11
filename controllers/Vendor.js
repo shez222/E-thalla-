@@ -6,6 +6,8 @@ const fs = require('fs');
 const path = require('path');
 const VendorDetail = db.VendorDetail
 const User = db.User
+const Vendor = db.VendorDetail
+const Shop = db.Shop
 
 
 const createVendorDetail = async (req, res) => {
@@ -183,7 +185,7 @@ const deleteVendorDetail = async (req, res) => {
 
 
 const postAddProducts = async (req, res, next) => {
-    const { title, description, price, userId } = req.body;
+    const { title, description, price, shopId } = req.body;
     console.log('hkjh');
     
     console.log(req.files); // Should show the uploaded images
@@ -201,7 +203,7 @@ const postAddProducts = async (req, res, next) => {
             price,
             imageUrl: imageUrls, // Assuming you want to save all image URLs
             description,
-            userId
+            shopId
         });
         
         // const result = await req.user.createProduct({
@@ -320,4 +322,94 @@ const getProducts = async (req, res, next) => {
     }
 };
 
-module.exports = { postAddProducts, getEditProducts, postEditProducts, postDeleteProduct, getProducts, deleteVendorDetail, createVendorDetail, getAllVendorDetails, getVendorDetailById, updateVendorDetail }
+
+// Create a new Shop
+const createShop = async (req, res) => {
+    try {
+        const { shopName, image, vendorId, location, description, ownerName, products } = req.body;
+        const shop = await Shop.create({ shopName, image, vendorId, location, description, ownerName });
+
+        // if (products && products.length > 0) {
+        //     const productPromises = products.map(product => Product.create({ ...product, shopId: shop.id }));
+        //     await Promise.all(productPromises);
+        // }
+
+        res.status(201).json(shop);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+};
+
+// Read all Shops with their Products
+const getShops = async (req, res) => {
+    try {
+        const shops = await Shop.findAll({
+            include: [
+                {
+                  model: Product,
+                  as: 'products',  // Use the alias defined in your association
+                },
+              ]
+        });
+        res.status(200).json(shops);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+// Read a single Shop by ID with Products
+const getShopById = async (req, res) => {
+    try {
+        const shop = await Shop.findByPk(req.params.id, {
+            include: [
+                {
+                  model: Product,
+                  as: 'products',  // Use the alias defined in your association
+                },
+              ]
+        });
+        if (!shop) return res.status(404).json({ message: 'Shop not found' });
+        res.status(200).json(shop);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+// Update a Shop
+const updateShop = async (req, res) => {
+    try {
+        const { shopName, image, vendorId, location, description, ownerName, products } = req.body;
+        const shop = await Shop.findByPk(req.params.id);
+        if (!shop) return res.status(404).json({ message: 'Shop not found' });
+
+        // Update the shop details
+        await shop.update({ shopName, image, vendorId, location, description, ownerName });
+
+        // Optionally, update the products associated with the shop
+        // if (products && products.length > 0) {
+        //     await Product.destroy({ where: { shopId: shop.id } });
+        //     const productPromises = products.map(product => Product.create({ ...product, shopId: shop.id }));
+        //     await Promise.all(productPromises);
+        // }
+
+        res.status(200).json(shop);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+};
+
+// Delete a Shop and its Products
+const deleteShop = async (req, res) => {
+    try {
+        const shop = await Shop.findByPk(req.params.id);
+        if (!shop) return res.status(404).json({ message: 'Shop not found' });
+
+        // Deleting the shop will also delete associated products due to CASCADE
+        await shop.destroy();
+        res.status(200).json({ message: 'Shop deleted' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+module.exports = { postAddProducts, getEditProducts, postEditProducts, postDeleteProduct, getProducts, deleteVendorDetail, createVendorDetail, getAllVendorDetails, getVendorDetailById, updateVendorDetail, createShop, getShops, getShopById, updateShop, deleteShop  }

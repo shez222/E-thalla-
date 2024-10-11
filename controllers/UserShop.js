@@ -1,8 +1,10 @@
 const { where } = require('sequelize');
 const db = require('../models');
+const Shop = require('../models/shop.js');
 const Product = db.Product
 const Cart = db.Cart
 const User = db.User
+
 
 const bcrypt = require('bcrypt');
 
@@ -192,4 +194,4 @@ const getOrders = async (req, res, next) => {
 
 
 
-module.exports = { getProducts, getProduct, getCart, postCart, postDeleteCartProduct, postOrder, getOrders }
+module.exports = { getProducts, getProduct, getCart, postCart, postDeleteCartProduct, postOrder, getOrders}

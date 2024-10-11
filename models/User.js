@@ -145,7 +145,7 @@ module.exports = (sequelize,DataTypes) =>{
       
       User.associate = function(models) {
         User.hasOne(models.Cart, { foreignKey: 'userId', as: 'cart' });
-        User.hasMany(models.Product, { foreignKey: 'userId', as: 'products' });
+        // User.hasMany(models.Product, { foreignKey: 'userId', as: 'products' });
         User.hasMany(models.Order, { foreignKey: 'userId', as: 'orders' });
       };
       
