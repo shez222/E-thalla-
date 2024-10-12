@@ -153,6 +153,8 @@ const postDeleteCartProduct = async (req, res, next) => {
 const postOrder = async (req, res, next) => {
     const userId = req.body.userId
     try {
+        console.log(userId);
+        
         const user = await User.findOne({ where : { multiUserId: userId}})
         const cart = await user.getCart();
         const products = await cart.getProducts();

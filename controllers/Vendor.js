@@ -360,7 +360,9 @@ const getShops = async (req, res) => {
 // Read a single Shop by ID with Products
 const getShopById = async (req, res) => {
     try {
-        const shop = await Shop.findByPk(req.params.id, {
+        console.log(req.params.shopId);
+        
+        const shop = await Shop.findByPk(req.params.shopId, {
             include: [
                 {
                   model: Product,
