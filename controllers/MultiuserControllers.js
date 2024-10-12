@@ -147,8 +147,10 @@ const MultiuserLogin = async (req, res, next) => {
 
         return res.json({ 
             token: token, 
-            userId: user.multiUserId,
-            msg:"OTP Send Successfully"
+            userId: user,
+            msg:"OTP Send Successfully",
+            otp:otp
+
         });
 
     } catch (error) {
