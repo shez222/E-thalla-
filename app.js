@@ -33,16 +33,16 @@ app.use(async (req, res, next) => {
 });
 app.get('/', (req,res,next)=>{
     res.json("sgahdhgda")
-    // next()
+    next()
 });
 
-// // Routes without file uploads
-// app.use('/E-Thalla', MultiUseruserRoutes);
-// app.use('/Shop', shopRoutes);
-// app.use('/service-provider-details', serviceProviderRoutes); // Add this line
+// Routes without file uploads
+app.use('/E-Thalla', MultiUseruserRoutes);
+app.use('/Shop', shopRoutes);
+app.use('/service-provider-details', serviceProviderRoutes); // Add this line
 
-// // Routes with file uploads will be handled in their respective route files
-// app.use('/Vendors', vendorRoutes);
+// Routes with file uploads will be handled in their respective route files
+app.use('/Vendors', vendorRoutes);
 
 // Error Handling Middleware (Optional)
 app.use((err, req, res, next) => {

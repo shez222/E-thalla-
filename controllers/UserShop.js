@@ -66,49 +66,43 @@ const getCart = async (req, res, next) => {
 const postCart = async (req, res, next) => {
     const prodId = req.body.productId;
     const userId = req.body.userId;
-    let fetchCart;
-    let newQuantity = 1;
+    const quantityToAdd = req.body.quantity || 1;
 
     try {
         // Check if user exists
-        const user = await User.findOne({ where: { multiUserId: userId }});
+        const user = await User.findOne({ where: { multiUserId: userId } });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
         // Check if the user has a cart, if not create one
-        let cartCheck = await Cart.findOne({ where: { userId: userId }});
-        if (!cartCheck) {
-            await user.createCart(); 
+        let cart = await Cart.findOne({ where: { userId: userId } });
+        if (!cart) {
+            cart = await user.createCart(); 
         }
 
-        // Get the cart
-        const cart = await user.getCart();
-        fetchCart = cart;
-
-        // Check if the product exists in the cart
-        const products = await cart.getProducts({ where: { id: prodId } });
+        // Check if the product is already in the cart
+        const cartProducts = await cart.getProducts({ where: { id: prodId } });
         let product;
-        if (products.length > 0) {
-            product = products[0];
-        }
+        if (cartProducts.length > 0) {
+            product = cartProducts[0];
 
-        // If product is already in the cart, increase the quantity
-        if (product) {
-            const oldQuantity = product.CartItem.quantity;
-            newQuantity = oldQuantity + 1;
+            // Update the quantity in the CartItem (junction table)
+            // const oldQuantity = product.CartItem.quantity;
+            // const newQuantity = oldQuantity + quantityToAdd;
+            await cart.addProduct(product, { through: { quantity: quantityToAdd } });
         } else {
-            // Fetch product by ID to add to the cart
+            // Fetch product by ID
             product = await Product.findByPk(prodId);
 
-            // If no product exists for the given prodId
+            // If no product found for the given prodId
             if (!product) {
                 return res.status(404).json({ message: 'Product not found' });
             }
-        }
 
-        // Add the product to the cart or update quantity
-        await fetchCart.addProduct(product, { through: { quantity: newQuantity } });
+            // Add new product to the cart
+            await cart.addProduct(product, { through: { quantity: quantityToAdd } });
+        }
 
         // Send success response
         res.json({ message: 'Product added to cart' });
@@ -118,6 +112,63 @@ const postCart = async (req, res, next) => {
         res.status(500).json({ message: 'Failed to add product to cart' });
     }
 };
+
+
+// const postCart = async (req, res, next) => {
+//     const prodId = req.body.productId;
+//     const userId = req.body.userId;
+//     let fetchCart;
+//     let newQuantity = 1;
+
+//     try {
+//         // Check if user exists
+//         const user = await User.findOne({ where: { multiUserId: userId }});
+//         if (!user) {
+//             return res.status(404).json({ message: 'User not found' });
+//         }
+
+//         // Check if the user has a cart, if not create one
+//         let cartCheck = await Cart.findOne({ where: { userId: userId }});
+//         if (!cartCheck) {
+//             await user.createCart(); 
+//         }
+
+//         // Get the cart
+//         const cart = await user.getCart();
+//         fetchCart = cart;
+
+//         // Check if the product exists in the cart
+//         const products = await cart.getProducts({ where: { id: prodId } });
+//         let product;
+//         if (products.length > 0) {
+//             product = products[0];
+//         }
+
+//         // If product is already in the cart, increase the quantity
+//         if (product) {
+//             const oldQuantity = product.CartItem.quantity;
+//             newQuantity = oldQuantity + 1;
+//         } else {
+//             // Fetch product by ID to add to the cart
+//             product = await Product.findByPk(prodId);
+
+//             // If no product exists for the given prodId
+//             if (!product) {
+//                 return res.status(404).json({ message: 'Product not found' });
+//             }
+//         }
+
+//         // Add the product to the cart or update quantity
+//         await fetchCart.addProduct(product, { through: { quantity: newQuantity } });
+
+//         // Send success response
+//         res.json({ message: 'Product added to cart' });
+
+//     } catch (err) {
+//         console.log(err);
+//         res.status(500).json({ message: 'Failed to add product to cart' });
+//     }
+// };
 
 const postDeleteCartProduct = async (req, res, next) => {
     const prodId = req.body.productId;
