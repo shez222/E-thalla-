@@ -4,10 +4,10 @@ const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 
 // Import routes
-const MultiUseruserRoutes = require('./routes/multiUserRoutes');
-const vendorRoutes = require('./routes/VendorRoute');
-const shopRoutes = require('./routes/ShopRoutes');
-const serviceProviderRoutes = require('./routes/ServiceProviderRoute'); // Add this line
+const MultiUseruserRoutes = require('./routes/multiUserRoutes.js');
+const vendorRoutes = require('./routes/VendorRoute.js');
+const shopRoutes = require('./routes/ShopRoutes.js');
+const serviceProviderRoutes = require('./routes/ServiceProviderRoute.js'); // Add this line
 const db = require('./models');
 const User = db.User;
 
@@ -37,12 +37,12 @@ app.get('/', (req,res,next)=>{
 });
 
 // Routes without file uploads
-// app.use('/E-Thalla', MultiUseruserRoutes);
-// app.use('/Shop', shopRoutes);
-// app.use('/service-provider-details', serviceProviderRoutes); // Add this line
+app.use('/E-Thalla', MultiUseruserRoutes);
+app.use('/Shop', shopRoutes);
+app.use('/service-provider-details', serviceProviderRoutes); // Add this line
 
-// // Routes with file uploads will be handled in their respective route files
-// app.use('/Vendors', vendorRoutes);
+// Routes with file uploads will be handled in their respective route files
+app.use('/Vendors', vendorRoutes);
 
 // Error Handling Middleware (Optional)
 app.use((err, req, res, next) => {
