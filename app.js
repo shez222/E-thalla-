@@ -31,7 +31,7 @@ app.use(async (req, res, next) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-app.use('/', (req,res,next)=>{
+app.get('/', (req,res,next)=>{
     res.json("sgahdhgda")
     // next()
 });
