@@ -7,7 +7,7 @@ const vendorRoutes = require('./routes/VendorRoute');
 const shopRoutes = require('./routes/ShopRoutes');
 const serviceProviderRoutes = require('./routes/ServiceProviderRoute'); // Add this line
 const db = require('./models');
-const User = db.User;
+// const User = db.User;
 
 // Initialize Express app
 const app = express();
