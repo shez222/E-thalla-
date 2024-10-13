@@ -1,5 +1,6 @@
 const express = require('express');
 
+
 // Import routes
 const MultiUseruserRoutes = require('./routes/multiUserRoutes');
 const vendorRoutes = require('./routes/VendorRoute');
@@ -11,9 +12,11 @@ const User = db.User;
 // Initialize Express app
 const app = express();
 
-// Middleware to parse JSON and URL-encoded data
+// // Middleware to parse JSON and URL-encoded data
 // app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
+// const storage = multer.memoryStorage(); // Using memory storage since we're not handling files
+// app.use(multer({ storage: storage }).any())
 
 // Middleware to attach user to request
 // app.use(async (req, res, next) => {
@@ -26,19 +29,17 @@ const app = express();
 //         res.status(500).json({ error: 'Internal server error' });
 //     }
 // });
-
-// Root route for testing
-app.get('/', (req, res, next) => {
-    res.json("Server is running!");
-    next();
+app.get('/', (req,res,next)=>{
+    res.json("sgahdhgda")
+    next()
 });
 
 // Routes without file uploads
 app.use('/E-Thalla', MultiUseruserRoutes);
 app.use('/Shop', shopRoutes);
-app.use('/service-provider-details', serviceProviderRoutes);
+app.use('/service-provider-details', serviceProviderRoutes); // Add this line
 
-// Routes with file uploads
+// Routes with file uploads will be handled in their respective route files
 app.use('/Vendors', vendorRoutes);
 
 // Error Handling Middleware (Optional)
@@ -47,5 +48,8 @@ app.use((err, req, res, next) => {
     res.status(500).send('Something broke!');
 });
 
-// Export the app for serverless functions
-module.exports = app;
+// Start the Server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
