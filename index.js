@@ -3,10 +3,10 @@ const path = require('path');
 
 
 // Import routes
-const MultiUseruserRoutes = require('./routes/multiUserRoutes');
-const vendorRoutes = require('./routes/VendorRoute');
-const shopRoutes = require('./routes/ShopRoutes');
-const serviceProviderRoutes = require('./routes/ServiceProviderRoute'); // Add this line
+// const MultiUseruserRoutes = require('./routes/multiUserRoutes');
+// const vendorRoutes = require('./routes/VendorRoute');
+// const shopRoutes = require('./routes/ShopRoutes');
+// const serviceProviderRoutes = require('./routes/ServiceProviderRoute'); // Add this line
 // const db = require('./models');
 // const User = db.User;
 
