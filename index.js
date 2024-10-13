@@ -2,7 +2,7 @@ const express = require('express');
 
 
 // Import routes
-// const MultiUseruserRoutes = require('./routes/multiUserRoutes');
+const MultiUseruserRoutes = require('./routes/multiUserRoutes');
 const vendorRoutes = require('./routes/VendorRoute');
 const shopRoutes = require('./routes/ShopRoutes');
 const serviceProviderRoutes = require('./routes/ServiceProviderRoute'); // Add this line
@@ -35,7 +35,7 @@ app.get('/', (req,res,next)=>{
 });
 
 // Routes without file uploads
-// app.use('/E-Thalla', MultiUseruserRoutes);
+app.use('/E-Thalla', MultiUseruserRoutes);
 app.use('/Shop', shopRoutes);
 app.use('/service-provider-details', serviceProviderRoutes); // Add this line
 
