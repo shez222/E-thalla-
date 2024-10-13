@@ -31,6 +31,10 @@ app.use(async (req, res, next) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+app.use('/', (req,res,next)=>{
+    res.json("sgahdhgda")
+    // next()
+});
 
 // Routes without file uploads
 app.use('/E-Thalla', MultiUseruserRoutes);
