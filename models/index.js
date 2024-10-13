@@ -1,47 +1,3 @@
-// 'use strict';
-
-// const fs = require('fs');
-// const path = require('path');
-// const Sequelize = require('sequelize');
-// const process = require('process');
-// const basename = path.basename(__filename);
-// const env = process.env.NODE_ENV || 'development';
-// const config = require(__dirname + '/../config/config.json')[env];
-// const db = {};
-
-// let sequelize;
-// if (config.use_env_variable) {
-//   sequelize = new Sequelize(process.env[config.use_env_variable], config);
-// } else {
-//   sequelize = new Sequelize(config.database, config.username, config.password, config);
-// }
-
-// fs
-//   .readdirSync(__dirname)
-//   .filter(file => {
-//     return (
-//       file.indexOf('.') !== 0 &&
-//       file !== basename &&
-//       file.slice(-3) === '.js' &&
-//       file.indexOf('.test.js') === -1
-//     );
-//   })
-//   .forEach(file => {
-//     const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
-//     db[model.name] = model;
-//   });
-
-// Object.keys(db).forEach(modelName => {
-//   if (db[modelName].associate) {
-//     db[modelName].associate(db);
-//   }
-// });
-
-// db.sequelize = sequelize;
-// db.Sequelize = Sequelize;
-
-// module.exports = db;
-
 const Sequelize = require('sequelize');
 const config = require('../config/config.json');
 const fs = require('fs');
@@ -52,7 +8,9 @@ const configEnv = config[env];
 
 const sequelize = new Sequelize(configEnv.database, configEnv.username, configEnv.password, {
   host: configEnv.host,
-  dialect: configEnv.dialect
+  port:configEnv.port,
+  dialect: configEnv.dialect,
+  logging: false
 });
 
 const db = {};
@@ -74,3 +32,46 @@ db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
 module.exports = db;
+
+
+// const Sequelize = require('sequelize');
+// const fs = require('fs');
+// const path = require('path');
+
+// // Use Clever Cloud environment variables for database connection
+// const database = process.env.MYSQL_ADDON_DB;
+// const username = process.env.MYSQL_ADDON_USER;
+// const password = process.env.MYSQL_ADDON_PASSWORD;
+// const host = process.env.MYSQL_ADDON_HOST;
+// const port = process.env.MYSQL_ADDON_PORT;
+// const dialect = 'mysql'; // As Clever Cloud is providing MySQL
+
+// // Initialize Sequelize with the Clever Cloud credentials
+// const sequelize = new Sequelize(database, username, password, {
+//   host: host,
+//   port: port,
+//   dialect: dialect,
+//   logging: false, // Disable logging, set to true for debugging
+// });
+
+// const db = {};
+
+// // Read all model files and add them to the `db` object
+// fs.readdirSync(__dirname)
+//   .filter(file => file !== 'index.js')
+//   .forEach(file => {
+//     const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
+//     db[model.name] = model;
+//   });
+
+// // Associate models if applicable
+// Object.keys(db).forEach(modelName => {
+//   if (db[modelName].associate) {
+//     db[modelName].associate(db);
+//   }
+// });
+
+// db.sequelize = sequelize;
+// db.Sequelize = Sequelize;
+
+// module.exports = db;

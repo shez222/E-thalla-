@@ -5,8 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon app.js",
-    "mig":"sequelize db:migrate",
-    "unmig":"sequelize db:migrate:undo "
+    "mig": "sequelize db:migrate",
+    "unmig": "sequelize db:migrate:undo "
   },
   "keywords": [],
   "author": "",
