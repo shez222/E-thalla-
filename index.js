@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
-const multer = require('multer');
-const { v4: uuidv4 } = require('uuid');
+
 
 // Import routes
 const MultiUseruserRoutes = require('./routes/multiUserRoutes');
