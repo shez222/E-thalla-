@@ -2,12 +2,12 @@ const express = require('express');
 
 
 // Import routes
-const MultiUseruserRoutes = require('./routes/multiUserRoutes');
-const vendorRoutes = require('./routes/VendorRoute');
-const shopRoutes = require('./routes/ShopRoutes');
-const serviceProviderRoutes = require('./routes/ServiceProviderRoute'); // Add this line
+// const MultiUseruserRoutes = require('./routes/multiUserRoutes');
+// const vendorRoutes = require('./routes/VendorRoute');
+// const shopRoutes = require('./routes/ShopRoutes');
+// const serviceProviderRoutes = require('./routes/ServiceProviderRoute'); // Add this line
 const db = require('./models');
-// const User = db.User;
+const User = db.User;
 
 // Initialize Express app
 const app = express();
@@ -29,24 +29,31 @@ const app = express();
 //         res.status(500).json({ error: 'Internal server error' });
 //     }
 // });
-app.get('/', (req,res,next)=>{
-    res.json("sgahdhgda")
-    next()
+app.get('/', async (req,res,next)=>{
+    try {
+        const user = await User.findByPk(1);
+        req.user = user;
+        res.json(user)
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 });
 
 // Routes without file uploads
-app.use('/E-Thalla', MultiUseruserRoutes);
-app.use('/Shop', shopRoutes);
-app.use('/service-provider-details', serviceProviderRoutes); // Add this line
+// app.use('/E-Thalla', MultiUseruserRoutes);
+// app.use('/Shop', shopRoutes);
+// app.use('/service-provider-details', serviceProviderRoutes); // Add this line
 
-// Routes with file uploads will be handled in their respective route files
-app.use('/Vendors', vendorRoutes);
+// // Routes with file uploads will be handled in their respective route files
+// app.use('/Vendors', vendorRoutes);
 
-// Error Handling Middleware (Optional)
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Something broke!');
-});
+// // Error Handling Middleware (Optional)
+// app.use((err, req, res, next) => {
+//     console.error(err.stack);
+//     res.status(500).send('Something broke!');
+// });
 
 // Start the Server
 const PORT = process.env.PORT || 3000;
