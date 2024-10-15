@@ -59,12 +59,9 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true
       },
-      createdAt: {
-        type: Sequelize.DATE,
-        allowNull: false
-      },
-      updatedAt: {
-        type: Sequelize.DATE,
+      isVerified: {  // Adding the verification status field
+        type: Sequelize.INTEGER,
+        defaultValue: 0, // 0 = Not Verified, 1 = Verified
         allowNull: false
       },
       // locationId: {
@@ -75,7 +72,15 @@ module.exports = {
       //   },
       //   onDelete: 'SET NULL',
       //   allowNull: true
-      // }
+      // },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false
+      }
     });
   },
 

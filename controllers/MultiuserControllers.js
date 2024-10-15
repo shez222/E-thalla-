@@ -5,7 +5,9 @@ const crypto = require('crypto')
 const  { sendEmail } = require('../utils/sendmail')
 const {forgotdata, otpdata} = require('../utils/otp&forgotmsg')
 const db = require('../models');
+const {sendOtpCode} = require('../utils/sendOtp');
 const MultiUser = db.User
+
 
 const MultiuserRegister = async (req, res) => {
     const { email, username, password, confirmpassword, role } = req.body;
@@ -69,42 +71,6 @@ const MultiuserRegister = async (req, res) => {
 };
 
 
-// const MultiuserRegister = async (req, res) => {
-//     const { email, username, password, confirmpassword,role} = req.body;
-//     console.log(email);
-    
-    
-//     try {
-//         const user = await MultiUser.findOne({ where: { email: email } });
-//         if (user) {
-//             return res.json({ error: "User already registered. Please login." });
-//         }
-
-//         if (password !== confirmpassword) {
-//             res.status(422).json("password not matched")
-//         }
-
-//         const hashedpw = await bcrypt.hash(password, 12);
-//         const newUser = await MultiUser.create({
-//             userName: username,
-//             password: hashedpw,
-//             email: email,
-//             currentRole: [{ 'role': 'user' }] // Default role assigned as 'user'
-//         });
-//         return res.json({
-//             user: newUser,
-//             msg: `Successfully created user with default role 'user'`
-//         });
-
-//     } catch (error) {
-//         if (!error.status) {
-//             error.status = 500;
-//         }
-//         res.status(error.status).json({ error: error.message });
-//     }
-// };
-
-
 
 const MultiuserLogin = async (req, res, next) => {
     const { email, password } = req.body;
@@ -123,14 +89,33 @@ const MultiuserLogin = async (req, res, next) => {
             return res.status(422).json({ error: 'Wrong Password' });
         }
 
-        const otp = crypto.randomInt(100000, 999999).toString();
-        const hashedOtp = await bcrypt.hash(otp, 12);
-        const otpData = otpdata(otp);
-        await sendEmail(email, otpData.html, otpData.subject);
+        // Check if the user is already verified
+        if (user.isVerified) {
+            // If verified, skip OTP and directly send token
+            const token = jwt.sign(
+                {
+                    email: user.email,
+                    userId: user.multiUserId.toString()
+                },
+                'somesupersecret', // Use environment variable
+                {
+                    expiresIn: '1h'
+                }
+            );
+            return res.json({
+                token: token,
+                userId: user,
+                msg: "User successfully logged in"
+            });
+        }
 
+        // If not verified, send OTP
+        const otp = await sendOtpCode(user);
+        
+        // Token creation
         const token = jwt.sign(
             {
-                email: user.Email,
+                email: user.email,
                 userId: user.multiUserId.toString()
             },
             'somesupersecret', // Use environment variable
@@ -139,23 +124,49 @@ const MultiuserLogin = async (req, res, next) => {
             }
         );
         
-        await user.update({
-            otp: hashedOtp,
-            otpExpiry: Date.now() + 900000,//15min
-            token: token
-        });
+        await user.update({ token });
 
         return res.json({ 
             token: token, 
             userId: user,
-            msg:"OTP Send Successfully",
-            otp:otp
-
+            msg: "OTP Sent Successfully",
+            otp: otp  // Only for testing, remove in production
         });
 
     } catch (error) {
         console.error(error);
         res.status(error.status || 500).json({ error: error.message });
+    }
+};
+
+const resendOtp = async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const user = await MultiUser.findOne({
+            where: { email: email }
+        });
+
+        if (!user) {
+            return res.status(422).json({ error: 'Not Registered' });
+        }
+
+        // Check if the user is already verified
+        if (user.isVerified) {
+            return res.status(200).json({ msg: "User is already verified. No OTP sent." });
+        }
+
+        // Resend OTP if not verified
+        const otp = await sendOtpCode(user);
+
+        return res.status(200).json({
+            msg: "OTP Resent Successfully",
+            otp: otp // Only for testing, remove in production
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to resend OTP" });
     }
 };
 
@@ -180,7 +191,8 @@ const matchOtp = async(req,res)=>{
     
     const updateuser = await user.update({
         otp:'',
-        otpExpiry:''
+        otpExpiry:'',
+        isVerified:1
     })
     console.log(updateuser);
     
@@ -376,5 +388,96 @@ const deleteUser = async (req, res) => {
 };
 
 
-module.exports = {MultiuserRegister, MultiuserLogin, matchOtp, forgotPassword, verifyForgetCode, setNewPassword, getAllUsers, getUserById,deleteUser, updateUser}
+module.exports = {MultiuserRegister, MultiuserLogin, matchOtp, forgotPassword, verifyForgetCode, setNewPassword, getAllUsers, getUserById,deleteUser, updateUser, resendOtp}
 
+
+
+// const MultiuserLogin = async (req, res, next) => {
+//     const { email, password } = req.body;
+
+//     try {
+//         const user = await MultiUser.findOne({
+//             where: { email: email }
+//         });
+
+//         if (!user) {
+//             return res.status(422).json({ error: 'Not Registered' });
+//         }
+
+//         const isEqual = await bcrypt.compare(password, user.password);
+//         if (!isEqual) {
+//             return res.status(422).json({ error: 'Wrong Password' });
+//         }
+
+//         const otp = crypto.randomInt(100000, 999999).toString();
+//         const hashedOtp = await bcrypt.hash(otp, 12);
+//         const otpData = otpdata(otp);
+//         await sendEmail(email, otpData.html, otpData.subject);
+
+//         const token = jwt.sign(
+//             {
+//                 email: user.Email,
+//                 userId: user.multiUserId.toString()
+//             },
+//             'somesupersecret', // Use environment variable
+//             {
+//                 expiresIn: '1h'
+//             }
+//         );
+        
+//         await user.update({
+//             otp: hashedOtp,
+//             otpExpiry: Date.now() + 900000,//15min
+//             token: token
+//         });
+
+//         return res.json({ 
+//             token: token, 
+//             userId: user,
+//             msg:"OTP Send Successfully",
+//             otp:otp
+
+//         });
+
+//     } catch (error) {
+//         console.error(error);
+//         res.status(error.status || 500).json({ error: error.message });
+//     }
+// };
+
+
+
+// const MultiuserRegister = async (req, res) => {
+//     const { email, username, password, confirmpassword,role} = req.body;
+//     console.log(email);
+    
+    
+//     try {
+//         const user = await MultiUser.findOne({ where: { email: email } });
+//         if (user) {
+//             return res.json({ error: "User already registered. Please login." });
+//         }
+
+//         if (password !== confirmpassword) {
+//             res.status(422).json("password not matched")
+//         }
+
+//         const hashedpw = await bcrypt.hash(password, 12);
+//         const newUser = await MultiUser.create({
+//             userName: username,
+//             password: hashedpw,
+//             email: email,
+//             currentRole: [{ 'role': 'user' }] // Default role assigned as 'user'
+//         });
+//         return res.json({
+//             user: newUser,
+//             msg: `Successfully created user with default role 'user'`
+//         });
+
+//     } catch (error) {
+//         if (!error.status) {
+//             error.status = 500;
+//         }
+//         res.status(error.status).json({ error: error.message });
+//     }
+// };

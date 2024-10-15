@@ -10,6 +10,7 @@ router.use(multer({ storage: storage }).none())
 
 router.post('/user/register', MultiUserController.MultiuserRegister);
 router.post('/user/login', MultiUserController.MultiuserLogin)
+router.post('/user/resend-otp', MultiUserController.resendOtp)
 router.post('/user/match-otp', MultiUserController.matchOtp)
 // Forgot password APIs
 router.post('/api/forgot-password', MultiUserController.forgotPassword );

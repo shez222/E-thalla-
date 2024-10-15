@@ -140,6 +140,11 @@ module.exports = (sequelize,DataTypes) =>{
         token: {
           type: DataTypes.STRING,
           allowNull: true
+        },
+        isVerified: {  // Adding the verification status field
+          type: DataTypes.INTEGER,
+          defaultValue: 0, // 0 = Not Verified, 1 = Verified
+          allowNull: false
         }
       });
       
