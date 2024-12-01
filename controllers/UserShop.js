@@ -39,9 +39,13 @@ const getProduct = async (req, res, next) => {
 
 const getCart = async (req, res, next) => {
     try {
+
+
         // await req.user.createCart()
-        const userId = req.body.userId
-        console.log("uyhuaifdyiyh",req.user.dataValues.multiUserId);
+        // const userId = req.body.userId
+        console.log("COMING HERE")
+        const userId = req.params.id 
+        // console.log("uyhuaifdyiyh",req.user.dataValues.multiUserId);
         // console.log(req.user);
         
         // const cartCheck = await Cart.findOne({where: {userId: req.user.dataValues.multiUserId}})
