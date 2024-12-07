@@ -1,5 +1,7 @@
 const express = require('express');
 const socketIo = require('socket.io');
+const Chat = require('./models/Chat');
+const Message = require('./models/Message');
 
 
 // Import routes
@@ -100,6 +102,43 @@ io.on("connection", (socket) => {
             text,
         });
     }); 
+    // ==========================
+    socket.on("sendMessage", async ({ senderId, receiverId, text }) => {
+        try {
+            // Find or create a chat between sender and receiver
+            let chat = await Chat.findOne({
+                where: { participants: { [Op.contains]: [senderId, receiverId] } },
+            });
+    
+            if (!chat) {
+                chat = await Chat.create({ participants: [senderId, receiverId] });
+            }
+    
+            // Save the message in the database
+            const message = await Message.create({
+                chatId: chat.id,
+                senderId,
+                receiverId,
+                type: 'text',
+                content: text,
+            });
+            
+            console.log("Message saved to DB:", message);
+
+            // Emit message to the receiver
+            const user = getUser(receiverId);
+            if (user) {
+                io.to(user.socketId).emit("getMessage", {
+                    senderId,
+                    text,
+                });
+            }
+        } catch (error) {
+            console.error("Error saving message:", error);
+        }
+    });
+    
+    // ==========================
     socket.on("sendMessage2", ({ senderId, receiverId, text }) => { // this is for testing purposes
         // const user = getUser(receiverId);
         console.log(`sender ${senderId} , reciever ${receiverId} , text ${text}`);
