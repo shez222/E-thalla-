@@ -24,3 +24,40 @@
 //   }
   
   
+
+// {
+//   "development": {
+//     "username": "umbdg6anmcdhsnux",
+//     "password": "NuA9KuEoHF4ast8cDrFd",
+//     "database": "b5sij6plbe8h830c2jgf",
+//     "host": "b5sij6plbe8h830c2jgf-mysql.services.clever-cloud.com",
+//     "dialect": "mysql",
+//     "port":3306
+//   },
+//   "test": {
+//     "username": "uswwm1bmvndme5uy",
+//     "password": "NNQbj1cLNn6gCdXSSTf4",
+//     "database": "ba0rsplolhaibg5cm7jm",
+//     "host": "ba0rsplolhaibg5cm7jm-mysql.services.clever-cloud.com",
+//     "dialect": "mysql",
+//     "port":3306
+//   },
+//   "production": {
+//     "username": "uswwm1bmvndme5uy",
+//     "password": "NNQbj1cLNn6gCdXSSTf4",
+//     "database": "ba0rsplolhaibg5cm7jm",
+//     "host": "ba0rsplolhaibg5cm7jm-mysql.services.clever-cloud.com",
+//     "dialect": "mysql",
+//     "port":3306
+//   }
+// }
+
+
+
+// do tos
+
+// stripe
+// bath
+// puncture
+// loru mairrag
+// eyes = > operation or new glasses ?  = both 

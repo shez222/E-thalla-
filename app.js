@@ -9,9 +9,15 @@ const shopRoutes = require('./routes/ShopRoutes');
 const serviceProviderRoutes = require('./routes/ServiceProviderRoute'); // Add this line
 const db = require('./models');
 const User = db.User;
+const stripeRoutes = require('./routes/stripeRoutes');
 
 // Initialize Express app
 const app = express();
+const bodyParser = require('body-parser');
+const cors = require('cors');
+// require('dotenv').config();
+
+
 
 // // Middleware to parse JSON and URL-encoded data
 // app.use(express.json());
@@ -30,10 +36,17 @@ const app = express();
 //         res.status(500).json({ error: 'Internal server error' });
 //     }
 // });
+
+
 app.get('/', (req,res,next)=>{
     res.json("sgahdhgda")
     next()
 });
+
+
+app.use(cors());
+app.use(bodyParser.json());
+
 
 // Routes without file uploads
 app.use('/E-Thalla', MultiUseruserRoutes);
@@ -48,6 +61,13 @@ app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Something broke!');
 });
+
+app.use('/create-checkout-session', stripeRoutes);
+
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    next();
+  });
 
 // Start the Server
 const PORT = process.env.PORT || 3000;
@@ -117,3 +137,11 @@ io.on("connection", (socket) => {
         io.emit("getUsers", users);
     });
 });
+
+
+
+// app.listen(PORT, '192.168.100.116', () => {
+//     console.log(`Server running at http://192.168.100.116:${PORT}`);
+//     console.log('Available endpoint:');
+//     console.log(`- POST http://192.168.100.116:${PORT}/create-checkout-session`);
+//   });
