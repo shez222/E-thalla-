@@ -53,11 +53,3 @@
 // }
 
 
-
-// do tos
-
-// stripe
-// bath
-// puncture
-// loru mairrag
-// eyes = > operation or new glasses ?  = both 
