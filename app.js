@@ -83,9 +83,15 @@ const io = socketIo(3001, {
 app.set('io', io); // Make Socket.io instance available in routes
 
   
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+// app.listen(PORT, () => {
+//     console.log(`Server is running on port ${PORT}`);
+// });
+
+app.listen(PORT, '192.168.100.65', () => {
+    console.log(`Server running at http://192.168.100.65:${PORT}`);
+    console.log('Available endpoint:');
+    console.log(`- POST http://192.168.100.65:${PORT}/create-checkout-session`);
+  });
 
 let users = [];
 

@@ -6,6 +6,7 @@ const router = express.Router();
 
 
 router.post('/', async (req, res) => {
+    console.log(req.body);
     try {
         const { amount, email, username, items } = req.body;
 
