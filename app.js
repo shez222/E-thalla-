@@ -6,6 +6,10 @@ const Message = require('./models/message');
 
 // Import routes
 const MultiUseruserRoutes = require('./routes/multiUserRoutes');
+// import { initializeOpenAI } from './controllers/openAI.js';
+const { initializeOpenAI, sendPromptToGpt } = require('./controllers/openAiController.js');
+
+// const openAi = require('./controllers/openAiController ');
 const vendorRoutes = require('./routes/VendorRoute');
 const shopRoutes = require('./routes/ShopRoutes');
 const serviceProviderRoutes = require('./routes/ServiceProviderRoute'); // Add this line
@@ -39,15 +43,47 @@ const cors = require('cors');
 //     }
 // });
 
+//=================
 
+app.use(cors());
+app.use(bodyParser.json());
+
+// Endpoint to handle PDF analysis
+app.post('/generate-map', async (req, res) => {
+    try {
+        //   const { prompt, pdfPresent } = req.body;
+        const { prompt } = req.body;
+        //   const pdfPath = req.file.path || "";
+        //   const newFilePath = `${pdfPath}.pdf`
+        //   fs.renameSync(pdfPath, newFilePath);
+
+        console.log(`prompt: ${prompt}`)
+        let response = await sendPromptToGpt("thread_4EgkjhkjgiYyS3lemTm", prompt);
+        response = JSON.parse(response);
+        console.log("response: " + response)
+
+
+        // Delete the uploaded file after processing
+        //   fs.unlinkSync(pdfPath);
+        //   fs.unlinkSync(newFilePath);
+
+        // res.json({ response });
+        res.status(200).send(response)
+        // res.status(200).send(JSON.stringify(response))
+    } catch (error) {
+        console.log('Error processing: ', error.message);
+        res.status(500).json({ error: 'An error occurred while processing.' });
+    }
+});
+
+//=================
 app.get('/', (req,res,next)=>{
-    res.json("sgahdhgda")
+    res.json({response: "sgahdhgda"})
     next()
 });
 
 
-app.use(cors());
-app.use(bodyParser.json());
+
 
 
 // Routes without file uploads
@@ -82,7 +118,11 @@ const io = socketIo(3001, {
 
 app.set('io', io); // Make Socket.io instance available in routes
 
-  
+(async () => {
+
+    initializeOpenAI()
+    console.log(`Serveeee}`);
+})
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

@@ -1,44 +1,32 @@
-import dotenv from 'dotenv';
-dotenv.config();
-import OpenAI from "openai";
-
 import { performance } from 'perf_hooks';
 import fs from 'fs'
 // import { sendPromptToGpt } from './openAI.js';
 
-
-const app = express();
-// connectDB();
-
-app.use(express.json());
-
-const upload = multer({ dest: 'uploads/' });
+import OpenAI from "openai";
 
 
-// Endpoint to handle PDF analysis
-app.post('/generate-map', async (req, res) => {
-    try {
-        //   const { prompt, pdfPresent } = req.body;
-        const { prompt } = req.body;
-        //   const pdfPath = req.file.path || "";
-        //   const newFilePath = `${pdfPath}.pdf`
-        //   fs.renameSync(pdfPath, newFilePath);
 
-        console.log(`prompt: ${prompt}`)
-        const response = await sendPromptToGpt("thread_sf6tqTMg36DZ8zMRTFsRjvOc", prompt);
-        console.log("response: " + response)
+// // Endpoint to handle map analysis
+// app.post('/generate-map', async (req, res) => {
+//     try {
+//         //   const { prompt, pdfPresent } = req.body;
+//         const { prompt } = req.body;
+//         //   const pdfPath = req.file.path || "";
+//         //   const newFilePath = `${pdfPath}.pdf`
+//         //   fs.renameSync(pdfPath, newFilePath);
+
+//         console.log(`prompt: ${prompt}`)
+//         const response = await sendPromptToGpt("thread_sf6tqTMg36DZ8zMRTFsRjvOc", prompt);
+//         console.log("response: " + response)
 
 
-        // Delete the uploaded file after processing
-        //   fs.unlinkSync(pdfPath);
-        //   fs.unlinkSync(newFilePath);
 
-        res.json({ response: response });
-    } catch (error) {
-        console.error('Error processing: ', error.message);
-        res.status(500).json({ error: 'An error occurred while processing.' });
-    }
-});
+//         res.json({ response: response });
+//     } catch (error) {
+//         console.error('Error processing: ', error.message);
+//         res.status(500).json({ error: 'An error occurred while processing.' });
+//     }
+// });
 
 
 
@@ -46,13 +34,16 @@ app.post('/generate-map', async (req, res) => {
 
 var ASSISTANT_ID;
 var openai;
-
+var GPT_MODEL= "gpt-3.5-turbo"
+var ASSISTANT_ID =  "asst_gsdgshhfdhdjJe6PCqovHC"
+var OPENAI_API_KEY = "dfgjdaga0rY5tFlLs7JORSJdJ0NJlpBlDnwFCtVSTD3Oisf9SkzisT3BlbkFJPCDGXbt-9gLl974WC86v8YeVd5o8-N03gSntvU3XL5S0gWrOnC1QFqOTYu2pcWicOUTmc-pgEA"
 export async function initializeOpenAI() {
-    ASSISTANT_ID = process.env.ASSISTANT_ID;
-    openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    console.log("Done open ai initialization: ", process.env.OPENAI_API_KEY)
+    // ASSISTANT_ID = "asst_RkHMwBlQ2PkHY7Je6PCqovHC";
+    ASSISTANT_ID = process.env.ASSISTANT_ID || ASSISTANT_ID;
+    openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || OPENAI_API_KEY});
+    console.log("Done open ai initialization: ", process.env.OPENAI_API_KEY || OPENAI_API_KEY)
 }
-
+// initializeOpenAI()  //uncomment this to connect with open ai
 export async function createAssistant(name, instructions) {
     const assistant = await openai.beta.assistants.create({
         name: name,
@@ -122,7 +113,6 @@ export async function runAssistant(threadId) {
     const response = await openai.beta.threads.runs.createAndPoll(threadId, {
         assistant_id: ASSISTANT_ID,
     });
-
 
     return response.id;
 }
@@ -290,16 +280,25 @@ export async function sendPromptToGpt(threadId, prompt) {
 
     let resBody;
     startTime = performance.now();
-    let runId = await runAssistant(threadId);
+    // let runId = await runAssistant(threadId);
+    let run = await runAssistant(threadId);
     endTime = performance.now();
     duration = endTime - startTime;
     console.log(`\nFunction run assistant took ${duration.toFixed(2)} milliseconds`);
 
+    let messages;
+    let finalmessage;
+    // console.log(run)
 
-    const messages = await openai.beta.threads.messages.list(threadId, {
-        run_id: runId,
-    });
-    const finalmessage = messages.data.pop();
+    // if (run.status === 'completed') {
+    
+        messages = await openai.beta.threads.messages.list(threadId, {
+            run_id: run,
+        });
+        // console.log(messages)
+
+        finalmessage = messages.data.pop();
+    // }
 
     // console.log("messages: ",finalmessage.content[0])
     startTime = performance.now();
@@ -324,6 +323,7 @@ export async function sendPromptToGpt(threadId, prompt) {
 
 
     // }
+    // console.log(finalmessage)
     return finalmessage.content[0].text.value;
 }
 
@@ -369,3 +369,38 @@ export async function getConversation(threadId) {
     // console.log(conversation);
     return conversation
 } 
+
+/*
+You have to act as an architect. Taking information of the plot size, its length and width, no of rooms, toilets they want and also kitchen.
+Now on the basis of this, you will have to give them response, and it would be in json so that it could be mapped to react svg. 
+
+Give me json that can be mapped using react native svg of the houes sizes and rooms provided by the user ( all rooms etc should be fix in standard sq yards rectangular boundry )
+
+Like this:
+
+const houseData = {
+    boundary: {
+      width: 300,
+      height: 450,
+      scale: 300 / 30, // Scale based on width (30 feet)
+    },
+    rooms: [
+      { name: "Car Porch", x: 0, y: 0, width: 10, height: 15 },
+      { name: "Drawing Room", x: 10, y: 0, width: 20, height: 15 },
+      { name: "Bedroom 1", x: 0, y: 15, width: 15, height: 15 },
+      { name: "Bedroom 2", x: 15, y: 15, width: 15, height: 15 },
+      { name: "Kitchen", x: 0, y: 30, width: 10, height: 15 },
+      { name: "Bathroom", x: 10, y: 30, width: 10, height: 15 },
+      { name: "Living Room", x: 20, y: 30, width: 10, height: 15 },
+    ],
+    doors: [
+      { name: "Main Gate", x: 5, y: 0, width: 5 },
+      { name: "Door to Drawing Room", x: 10, y: 15, width: 5 },
+      { name: "Door to Bedroom 1", x: 7.5, y: 15, width: 5 },
+      { name: "Door to Bedroom 2", x: 22.5, y: 15, width: 5 },
+      { name: "Door to Bathroom", x: 15, y: 30, width: 4 },
+      { name: "Door to Kitchen", x: 5, y: 30, width: 5 },
+      { name: "Door to Living Room", x: 25, y: 30, width: 5 },
+    ],
+  };
+*/
