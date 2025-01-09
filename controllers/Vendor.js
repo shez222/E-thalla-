@@ -8,6 +8,14 @@ const VendorDetail = db.VendorDetail
 const User = db.User
 const Vendor = db.VendorDetail
 const Shop = db.Shop
+const Availability = db.Availability
+const LicenseCertificate = db.LicenseCertificate
+const AvailabilityDay = db.AvailabilityDay
+const ProductImage = db.ProductImage
+const {sequelize} = db
+
+
+
 
 
 const createVendorDetail = async (req, res) => {
@@ -324,21 +332,143 @@ const getProducts = async (req, res, next) => {
 
 
 // Create a new Shop
+// Create a new Shop
 const createShop = async (req, res) => {
+    const transaction = await sequelize.transaction();
     try {
-        const { shopName, image, vendorId, location, description, ownerName, products } = req.body;
-        const shop = await Shop.create({ shopName, image, vendorId, location, description, ownerName });
-
-        // if (products && products.length > 0) {
-        //     const productPromises = products.map(product => Product.create({ ...product, shopId: shop.id }));
-        //     await Promise.all(productPromises);
-        // }
-
-        res.status(201).json(shop);
+      const { shopDetails, items, availability, licensesAndCertificates, vendorId } = req.body;
+  
+      const { shopName, shopLocation, phone, email, profilePicture } = shopDetails;
+  
+      // Create the Shop
+      const shop = await Shop.create(
+        {
+          shopName,
+          location: shopLocation, // Assuming 'location' maps to 'shopLocation'
+          phone,
+          email,
+          profilePicture,
+          vendorId
+        },
+        { transaction }
+      );
+  
+      // Create Availability and AvailabilityDays
+      if (availability && availability.days && Array.isArray(availability.days)) {
+        const shopAvailability = await Availability.create(
+          {
+            shopId: shop.shopId
+          },
+          { transaction }
+        );
+  
+        const availabilityDaysData = availability.days.map(day => ({
+          availabilityId: shopAvailability.id,
+          day: day.day,
+          startTime: day.startTime || null,
+          endTime: day.endTime || null,
+          isClosed: day.isClosed
+        }));
+  
+        await AvailabilityDay.bulkCreate(availabilityDaysData, { transaction });
+      }
+  
+      // Create Licenses and Certificates
+      if (licensesAndCertificates && Array.isArray(licensesAndCertificates)) {
+        const licensesData = licensesAndCertificates.map(cert => ({
+          shopId: shop.shopId,
+          certificateId: cert.id,
+          url: cert.url
+        }));
+  
+        await LicenseCertificate.bulkCreate(licensesData, { transaction });
+      }
+  
+      // Create Products and their Images
+      if (items && Array.isArray(items)) {
+        for (const item of items) {
+          const { itemName, quality, quantity, price, images } = item;
+  
+          // Create Product
+          const product = await Product.create(
+            {
+              title: itemName,
+              quality,
+              quantity,
+              price,
+              shopId: shop.shopId
+            },
+            { transaction }
+          );
+  
+          // Create Product Images
+          if (images && Array.isArray(images)) {
+            const productImagesData = images.map(img => ({
+              productId: product.id,
+              imageId: img.id,
+              url: img.url
+            }));
+  
+            await ProductImage.bulkCreate(productImagesData, { transaction });
+          }
+        }
+      }
+  
+      await transaction.commit();
+  
+      // Fetch the newly created shop with associations to return in response
+      const createdShop = await Shop.findOne({
+        where: { shopId: shop.shopId },
+        include: [
+          {
+            model: Product,
+            as: 'products',
+            include: [
+              {
+                model: ProductImage,
+                as: 'images'
+              }
+            ]
+          },
+          {
+            model: Availability,
+            as: 'availability',
+            include: [
+              {
+                model: AvailabilityDay,
+                as: 'days'
+              }
+            ]
+          },
+          {
+            model: LicenseCertificate,
+            as: 'licensesAndCertificates'
+          }
+        ]
+      });
+  
+      res.status(201).json(createdShop);
     } catch (err) {
-        res.status(400).json({ message: err.message });
+      await transaction.rollback();
+      console.error(err);
+      res.status(400).json({ message: err.message });
     }
-};
+  };
+// const createShop = async (req, res) => {
+//     try {
+//         const { shopName, image, vendorId, location, description, ownerName, products } = req.body;
+//         const shop = await Shop.create({ shopName, image, vendorId, location, description, ownerName });
+
+//         // if (products && products.length > 0) {
+//         //     const productPromises = products.map(product => Product.create({ ...product, shopId: shop.id }));
+//         //     await Promise.all(productPromises);
+//         // }
+
+//         res.status(201).json(shop);
+//     } catch (err) {
+//         res.status(400).json({ message: err.message });
+//     }
+// };
 
 // Read all Shops with their Products
 const getShops = async (req, res) => {
@@ -346,59 +476,342 @@ const getShops = async (req, res) => {
         const shops = await Shop.findAll({
             include: [
                 {
-                  model: Product,
-                  as: 'products',  // Use the alias defined in your association
+                    model: Product,
+                    as: 'products',
+                    include: [
+                        {
+                            model: ProductImage,
+                            as: 'images'
+                        }
+                    ]
                 },
-              ]
+                {
+                    model: Availability,
+                    as: 'availability',
+                    include: [
+                        {
+                            model: AvailabilityDay,
+                            as: 'days'
+                        }
+                    ]
+                },
+                {
+                    model: LicenseCertificate,
+                    as: 'licensesAndCertificates'
+                }
+            ]
         });
         res.status(200).json(shops);
     } catch (err) {
+        console.error(err);
         res.status(500).json({ message: err.message });
     }
 };
 
+// const getShops = async (req, res) => {
+//     try {
+//         const shops = await Shop.findAll({
+//             include: [
+//                 {
+//                   model: Product,
+//                   as: 'products',  // Use the alias defined in your association
+//                 },
+//               ]
+//         });
+//         res.status(200).json(shops);
+//     } catch (err) {
+//         res.status(500).json({ message: err.message });
+//     }
+// };
+
 // Read a single Shop by ID with Products
+// Read a single Shop by ID with Products, Availability, and Licenses
 const getShopById = async (req, res) => {
     try {
-        console.log(req.params.shopId);
-        
-        const shop = await Shop.findByPk(req.params.shopId, {
+      const shop = await Shop.findByPk(req.params.shopId, {
+        include: [
+          {
+            model: Product,
+            as: 'products',
             include: [
-                {
-                  model: Product,
-                  as: 'products',  // Use the alias defined in your association
-                },
-              ]
-        });
-        if (!shop) return res.status(404).json({ message: 'Shop not found' });
-        res.status(200).json(shop);
+              {
+                model: ProductImage,
+                as: 'images'
+              }
+            ]
+          },
+          {
+            model: Availability,
+            as: 'availability',
+            include: [
+              {
+                model: AvailabilityDay,
+                as: 'days'
+              }
+            ]
+          },
+          {
+            model: LicenseCertificate,
+            as: 'licensesAndCertificates'
+          }
+        ]
+      });
+  
+      if (!shop) {
+        return res.status(404).json({ message: 'Shop not found' });
+      }
+  
+      res.status(200).json(shop);
     } catch (err) {
-        res.status(500).json({ message: err.message });
+      res.status(500).json({ message: err.message });
     }
-};
+  };
+  
+// const getShopById = async (req, res) => {
+//     try {
+//         console.log(req.params.shopId);
+        
+//         const shop = await Shop.findByPk(req.params.shopId, {
+//             include: [
+//                 {
+//                   model: Product,
+//                   as: 'products',  // Use the alias defined in your association
+//                 },
+//               ]
+//         });
+//         if (!shop) return res.status(404).json({ message: 'Shop not found' });
+//         res.status(200).json(shop);
+//     } catch (err) {
+//         res.status(500).json({ message: err.message });
+//     }
+// };
 
 // Update a Shop
 const updateShop = async (req, res) => {
+    const transaction = await sequelize.transaction();
     try {
-        const { shopName, image, vendorId, location, description, ownerName, products } = req.body;
-        const shop = await Shop.findByPk(req.params.id);
-        if (!shop) return res.status(404).json({ message: 'Shop not found' });
+        const { shopDetails, items, availability, licensesAndCertificates } = req.body;
 
-        // Update the shop details
-        await shop.update({ shopName, image, vendorId, location, description, ownerName });
+        // Fetch the shop by primary key
+        const shop = await Shop.findByPk(req.params.id, {
+            include: [
+                {
+                    model: Product,
+                    as: 'products',
+                    include: [
+                        {
+                            model: ProductImage,
+                            as: 'images'
+                        }
+                    ]
+                },
+                {
+                    model: Availability,
+                    as: 'availability',
+                    include: [
+                        {
+                            model: AvailabilityDay,
+                            as: 'days'
+                        }
+                    ]
+                },
+                {
+                    model: LicenseCertificate,
+                    as: 'licensesAndCertificates'
+                }
+            ],
+            transaction
+        });
 
-        // Optionally, update the products associated with the shop
-        // if (products && products.length > 0) {
-        //     await Product.destroy({ where: { shopId: shop.id } });
-        //     const productPromises = products.map(product => Product.create({ ...product, shopId: shop.id }));
-        //     await Promise.all(productPromises);
-        // }
+        if (!shop) {
+            await transaction.rollback();
+            return res.status(404).json({ message: 'Shop not found' });
+        }
 
-        res.status(200).json(shop);
+        // Update shop details
+        const { shopName, image, vendorId, location, description, ownerName } = shopDetails;
+        await shop.update(
+            { shopName, image, vendorId, location, description, ownerName },
+            { transaction }
+        );
+
+        // Update Availability and AvailabilityDays
+        if (availability && availability.days && Array.isArray(availability.days)) {
+            if (shop.availability) {
+                // Update existing Availability
+                // For simplicity, assume there's only one Availability record per Shop
+                await AvailabilityDay.destroy({ where: { availabilityId: shop.availability.id }, transaction });
+
+                const availabilityDaysData = availability.days.map(day => ({
+                    availabilityId: shop.availability.id,
+                    day: day.day,
+                    startTime: day.startTime || null,
+                    endTime: day.endTime || null,
+                    isClosed: day.isClosed
+                }));
+
+                await AvailabilityDay.bulkCreate(availabilityDaysData, { transaction });
+            } else {
+                // Create new Availability and AvailabilityDays
+                const newAvailability = await Availability.create(
+                    { shopId: shop.shopId },
+                    { transaction }
+                );
+
+                const availabilityDaysData = availability.days.map(day => ({
+                    availabilityId: newAvailability.id,
+                    day: day.day,
+                    startTime: day.startTime || null,
+                    endTime: day.endTime || null,
+                    isClosed: day.isClosed
+                }));
+
+                await AvailabilityDay.bulkCreate(availabilityDaysData, { transaction });
+            }
+        }
+
+        // Update Licenses and Certificates
+        if (licensesAndCertificates && Array.isArray(licensesAndCertificates)) {
+            // Option 1: Delete existing and recreate
+            await LicenseCertificate.destroy({ where: { shopId: shop.shopId }, transaction });
+
+            const licensesData = licensesAndCertificates.map(cert => ({
+                shopId: shop.shopId,
+                certificateId: cert.id,
+                url: cert.url
+            }));
+
+            await LicenseCertificate.bulkCreate(licensesData, { transaction });
+
+            // Option 2: Update existing or create new (more complex)
+            // Implement if you need partial updates
+        }
+
+        // Update Products and their Images
+        if (items && Array.isArray(items)) {
+            for (const item of items) {
+                const { id, itemName, quality, quantity, price, images } = item; // Assume each product has an 'id' if existing
+
+                if (id) {
+                    // Existing product - update
+                    const existingProduct = await Product.findOne({
+                        where: { id, shopId: shop.shopId },
+                        include: [{ model: ProductImage, as: 'images' }],
+                        transaction
+                    });
+
+                    if (existingProduct) {
+                        await existingProduct.update(
+                            { title: itemName, quality, quantity, price },
+                            { transaction }
+                        );
+
+                        // Update Product Images
+                        if (images && Array.isArray(images)) {
+                            // Option 1: Delete existing images and recreate
+                            await ProductImage.destroy({ where: { productId: existingProduct.id }, transaction });
+
+                            const productImagesData = images.map(img => ({
+                                productId: existingProduct.id,
+                                imageId: img.id,
+                                url: img.url
+                            }));
+
+                            await ProductImage.bulkCreate(productImagesData, { transaction });
+                        }
+                    }
+                } else {
+                    // New product - create
+                    const newProduct = await Product.create(
+                        {
+                            title: itemName,
+                            quality,
+                            quantity,
+                            price,
+                            shopId: shop.shopId
+                        },
+                        { transaction }
+                    );
+
+                    if (images && Array.isArray(images)) {
+                        const productImagesData = images.map(img => ({
+                            productId: newProduct.id,
+                            imageId: img.id,
+                            url: img.url
+                        }));
+
+                        await ProductImage.bulkCreate(productImagesData, { transaction });
+                    }
+                }
+            }
+
+            // Optionally, handle deletion of products not present in the update
+            // Example:
+            // const updatedProductIds = items.filter(item => item.id).map(item => item.id);
+            // await Product.destroy({ where: { shopId: shop.shopId, id: { [Op.notIn]: updatedProductIds } }, transaction });
+        }
+
+        await transaction.commit();
+
+        // Fetch the updated shop with associations to return in response
+        const updatedShop = await Shop.findOne({
+            where: { shopId: shop.shopId },
+            include: [
+                {
+                    model: Product,
+                    as: 'products',
+                    include: [
+                        {
+                            model: ProductImage,
+                            as: 'images'
+                        }
+                    ]
+                },
+                {
+                    model: Availability,
+                    as: 'availability',
+                    include: [
+                        {
+                            model: AvailabilityDay,
+                            as: 'days'
+                        }
+                    ]
+                },
+                {
+                    model: LicenseCertificate,
+                    as: 'licensesAndCertificates'
+                }
+            ]
+        });
+
+        res.status(200).json(updatedShop);
     } catch (err) {
+        await transaction.rollback();
+        console.error(err);
         res.status(400).json({ message: err.message });
     }
 };
+// const updateShop = async (req, res) => {
+//     try {
+//         const { shopName, image, vendorId, location, description, ownerName, products } = req.body;
+//         const shop = await Shop.findByPk(req.params.id);
+//         if (!shop) return res.status(404).json({ message: 'Shop not found' });
+
+//         // Update the shop details
+//         await shop.update({ shopName, image, vendorId, location, description, ownerName });
+
+//         // Optionally, update the products associated with the shop
+//         // if (products && products.length > 0) {
+//         //     await Product.destroy({ where: { shopId: shop.id } });
+//         //     const productPromises = products.map(product => Product.create({ ...product, shopId: shop.id }));
+//         //     await Promise.all(productPromises);
+//         // }
+
+//         res.status(200).json(shop);
+//     } catch (err) {
+//         res.status(400).json({ message: err.message });
+//     }
+// };
 
 // Delete a Shop and its Products
 const deleteShop = async (req, res) => {
