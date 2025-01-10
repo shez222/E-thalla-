@@ -49,6 +49,8 @@ const password = process.env.MYSQL_ADDON_PASSWORD;
 const host = process.env.MYSQL_ADDON_HOST;
 const port = process.env.MYSQL_ADDON_PORT;
 const dialect = 'mysql'; // As Clever Cloud is providing MySQL
+console.log(database, username, password, host, port, dialect);
+
 
 // Initialize Sequelize with the Clever Cloud credentials
 const sequelize = new Sequelize(database, username, password, {
