@@ -322,7 +322,14 @@ const postDeleteProduct = async (req, res, next) => {
 
 const getProducts = async (req, res, next) => {
     try {
-        const products = await Product.findAll();
+        const products = await Product.findAll({
+            include: [
+                {
+                    model: ProductImage,
+                    as: 'images'
+                }
+            ]
+        });
         res.json({ products });
     } catch (err) {
         console.log(err);

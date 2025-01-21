@@ -95,7 +95,7 @@ router.delete('/:vendorId', upload.none(), adminController.deleteVendorDetail);
 // Create a new shop
 router.post(
     '/create-shop',
-    upload.single('image'), // Assuming only one image for shop
+    upload.single('profilePicture'), // Assuming only one image for shop
     adminController.createShop
 );
 
