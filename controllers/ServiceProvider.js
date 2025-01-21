@@ -26,10 +26,14 @@ const createServiceProviderDetail = async (req, res) => {
       reviews,
       status,
       yearsInBusiness,
-      preferredContactMethod
+      preferredContactMethod,
+      experience
     } = req.body;
 
     const { userId } = req.body; // Ensure userId is provided
+
+console.log("dsa",specialization);
+
 
     // Validate required fields
     if (!userId || !specialization || !availability) {
@@ -70,6 +74,7 @@ const createServiceProviderDetail = async (req, res) => {
       yearsInBusiness,
       preferredContactMethod,
       pastProjects,
+      specialization,
       userId
     });
 

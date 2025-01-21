@@ -13,10 +13,10 @@ module.exports = {
       //   type: Sequelize.STRING,
       //   allowNull: false
       // },
-      // specialization: {
-      //   type: Sequelize.STRING,
-      //   allowNull: false
-      // },
+      specialization: {
+        type: Sequelize.JSON,
+        allowNull: false
+      },
       availability: {
         type: Sequelize.JSON,
         allowNull: false

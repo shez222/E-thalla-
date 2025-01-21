@@ -12,10 +12,10 @@ module.exports = (sequelize, DataTypes) => {
     //   type: DataTypes.STRING,
     //   allowNull: false
     // },
-    // specialization: {
-    //   type: DataTypes.STRING,
-    //   allowNull: false
-    // },
+    specialization: {
+      type: DataTypes.JSON,
+      allowNull: false,
+    },
     availability: {
       type: DataTypes.JSON,
       allowNull: false
