@@ -1,6 +1,4 @@
-const { where } = require('sequelize');
 const db = require('../models');
-const Shop = require('../models/shop.js');
 const Product = db.Product
 const Cart = db.Cart
 const User = db.User
@@ -249,6 +247,46 @@ const getOrders = async (req, res, next) => {
     }
 };
 
+const deleteCart = async (req, res, next) => {
+    // Retrieve userId from URL parameters
+    const userId = req.params.id; // Ensure your route is set up to pass 'id' as a URL parameter
+    console.log(`Deleting cart for userId: ${userId}`);
+
+    try {
+        // Find the user by multiUserId
+        const user = await User.findOne({ where: { multiUserId: userId } });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Get the user's cart
+        const cart = await user.getCart();
+        if (!cart) {
+            return res.status(404).json({ message: 'Cart not found' });
+        }
+
+        // Retrieve current products in the cart
+        const currentProducts = await cart.getProducts();
+
+        // Check if the cart is already empty
+        if (currentProducts.length === 0) {
+            return res.status(200).json({ message: 'Cart is already empty' });
+        }
+
+        // Remove all products from the cart
+        await cart.setProducts([]); // This disassociates all products from the cart
+
+        // Optionally, you can also delete the cart entirely if desired
+        // await cart.destroy();
+
+        res.status(200).json({ message: 'All products have been removed from the cart' });
+    } catch (err) {
+        console.error(`Error deleting cart for userId ${userId}:`, err);
+        res.status(500).json({ message: 'Failed to delete all cart products' });
+    }
+};
 
 
-module.exports = { getProducts, getProduct, getCart, postCart, postDeleteCartProduct, postOrder, getOrders}
+
+
+module.exports = { getProducts, getProduct, getCart, postCart, postDeleteCartProduct, postOrder, getOrders, deleteCart}
