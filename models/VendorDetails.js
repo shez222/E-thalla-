@@ -1,67 +1,156 @@
+
 // models/vendorDetail.js
 
-module.exports = (sequelize, DataTypes) => {    
+module.exports = (sequelize, DataTypes) => {
     const VendorDetail = sequelize.define('VendorDetail', {
-        vendorId: {
-            type: DataTypes.INTEGER,
-            autoIncrement: true,
-            allowNull: true,
-            primaryKey: true
-        },
-        phoneNumber: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        description: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-        selectedItems: {
-            type: DataTypes.JSON,
-            allowNull: false
-        },
-        priceRange: {
-            type: DataTypes.JSON,
-            allowNull: false
-        },
-        timeSelection: {
-            type: DataTypes.JSON,
-            allowNull: false
-        },
-        selectedDays: {
-            type: DataTypes.JSON,
-            allowNull: true,
-            defaultValue: []
-        },
-        uploadImages: {
-            type: DataTypes.JSON,
-            allowNull: true,
-            defaultValue: {
-                images: [],
-                certificateImages: []
-            }
-        },
-        createdAt: {
-            type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: DataTypes.NOW
-        },
-        updatedAt: {
-            type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: DataTypes.NOW
+      vendorId: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        allowNull: true,
+        primaryKey: true
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      serviceType: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      phoneNumber: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      description: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      selectedItems: {
+        type: DataTypes.JSON,
+        allowNull: false
+      },
+    //   priceRange: {
+    //     type: DataTypes.JSON,
+    //     allowNull: false
+    //   },
+    //   timeSelection: {
+    //     type: DataTypes.JSON,
+    //     allowNull: false
+    //   },
+    //   selectedDays: {
+    //     type: DataTypes.JSON,
+    //     allowNull: true,
+    //     defaultValue: []
+    //   },
+      uploadImages: {
+        type: DataTypes.JSON,
+        allowNull: true,
+        defaultValue: {
+          images: [],
+          certificateImages: []
         }
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW
+      }
     });
-        
+  
     VendorDetail.associate = function(models) {
-        // Define associations here
-        VendorDetail.belongsTo(models.User, {
-            foreignKey: 'userId',
-            as: 'user'
-        });
+      // Define associations here
+      VendorDetail.belongsTo(models.User, {
+        foreignKey: 'userId',
+        as: 'user'
+      });
     };
     return VendorDetail;
-};
+  };
+
+
+
+
+
+
+
+
+
+
+
+
+// models/vendorDetail.js
+
+// module.exports = (sequelize, DataTypes) => {    
+//     const VendorDetail = sequelize.define('VendorDetail', {
+//         vendorId: {
+//             type: DataTypes.INTEGER,
+//             autoIncrement: true,
+//             allowNull: true,
+//             primaryKey: true
+//         },
+//         phoneNumber: {
+//             type: DataTypes.STRING,
+//             allowNull: false
+//         },
+//         description: {
+//             type: DataTypes.STRING,
+//             allowNull: false
+//         },
+//         selectedItems: {
+//             type: DataTypes.JSON,
+//             allowNull: false
+//         },
+//         priceRange: {
+//             type: DataTypes.JSON,
+//             allowNull: false
+//         },
+//         timeSelection: {
+//             type: DataTypes.JSON,
+//             allowNull: false
+//         },
+//         selectedDays: {
+//             type: DataTypes.JSON,
+//             allowNull: true,
+//             defaultValue: []
+//         },
+//         uploadImages: {
+//             type: DataTypes.JSON,
+//             allowNull: true,
+//             defaultValue: {
+//                 images: [],
+//                 certificateImages: []
+//             }
+//         },
+//         createdAt: {
+//             type: DataTypes.DATE,
+//             allowNull: false,
+//             defaultValue: DataTypes.NOW
+//         },
+//         updatedAt: {
+//             type: DataTypes.DATE,
+//             allowNull: false,
+//             defaultValue: DataTypes.NOW
+//         }
+//     });
+        
+//     VendorDetail.associate = function(models) {
+//         // Define associations here
+//         VendorDetail.belongsTo(models.User, {
+//             foreignKey: 'userId',
+//             as: 'user'
+//         });
+//     };
+//     return VendorDetail;
+// };
 
 
 

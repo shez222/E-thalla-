@@ -1,3 +1,4 @@
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('Products', {
@@ -7,49 +8,50 @@ module.exports = {
         allowNull: false,
         primaryKey: true
       },
-      title: { // Changed from 'title' to 'itemName' if needed
+      title: { // Product Title
         type: Sequelize.STRING,
         allowNull: false
       },
-      quality: { // New field
+      quality: { // Product Quality
         type: Sequelize.STRING,
         allowNull: false
       },
-      quantity: { // New field
+      quantity: { // Available Quantity
         type: Sequelize.STRING,
         allowNull: false
       },
-      price: { // Changed to STRING to accommodate formats like "700 PKR per bag"
-        type: Sequelize.STRING,
+      price: { // Product Price
+        type: Sequelize.STRING, // Changed to STRING to accommodate formats like "700 PKR per bag"
         allowNull: false
       },
-      description: {
+      description: { // Product Description
         type: Sequelize.STRING,
         allowNull: true
       },
-      shopId: { // Foreign Key
+      shopId: { // Foreign Key to Shops Table
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'Shops',
-          key: 'shopId'
+          model: 'Shops', // Ensure that the 'Shops' table exists
+          key: 'shopId' // Assuming 'id' is the primary key of 'Shops'. Change to 'shopId' if 'shopId' is the primary key.
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
       },
-      createdAt: { // Timestamps
+      createdAt: { // Timestamp
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       },
-      updatedAt: { // Timestamps
+      updatedAt: { // Timestamp
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       }
     });
 
-    // If you have additional indexes or constraints, add them here
+    // Add indexes if necessary
+    // await queryInterface.addIndex('Products', ['shopId']);
   },
 
   down: async (queryInterface, Sequelize) => {
@@ -70,57 +72,71 @@ module.exports = {
 
 
 
-
-
-
-// // migrations/YYYYMMDDHHMMSS-create-product.js
-
 // module.exports = {
 //   up: async (queryInterface, Sequelize) => {
 //     await queryInterface.createTable('Products', {
-//       id: {
+//       id: { // Primary Key
 //         type: Sequelize.INTEGER,
 //         autoIncrement: true,
 //         allowNull: false,
 //         primaryKey: true
 //       },
-//       title: {
-//         type: Sequelize.STRING
-//       },
-//       price: {
-//         type: Sequelize.DOUBLE,
-//         allowNull: false
-//       },
-//       imageUrl: {
-//         type: Sequelize.JSON,
-//         allowNull: true,
-//         default:[]
-//       },
-//       description: {
+//       title: { // Changed from 'title' to 'itemName' if needed
 //         type: Sequelize.STRING,
 //         allowNull: false
 //       },
-//       createdAt: {
-//         type: Sequelize.DATE,
+//       quality: { // New field
+//         type: Sequelize.STRING,
 //         allowNull: false
 //       },
-//       updatedAt: {
-//         type: Sequelize.DATE,
+//       quantity: { // New field
+//         type: Sequelize.STRING,
 //         allowNull: false
 //       },
-//       shopId: {
+//       price: { // Changed to STRING to accommodate formats like "700 PKR per bag"
+//         type: Sequelize.STRING,
+//         allowNull: false
+//       },
+//       description: {
+//         type: Sequelize.STRING,
+//         allowNull: true
+//       },
+//       shopId: { // Foreign Key
 //         type: Sequelize.INTEGER,
+//         allowNull: false,
 //         references: {
 //           model: 'Shops',
 //           key: 'shopId'
 //         },
-//         onDelete: 'CASCADE',
-//         allowNull: false
+//         onUpdate: 'CASCADE',
+//         onDelete: 'CASCADE'
+//       },
+//       createdAt: { // Timestamps
+//         allowNull: false,
+//         type: Sequelize.DATE,
+//         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+//       },
+//       updatedAt: { // Timestamps
+//         allowNull: false,
+//         type: Sequelize.DATE,
+//         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
 //       }
 //     });
+
+//     // If you have additional indexes or constraints, add them here
 //   },
 
-//   down: async (queryInterface) => {
+//   down: async (queryInterface, Sequelize) => {
 //     await queryInterface.dropTable('Products');
 //   }
 // };
+
+
+
+
+
+
+
+
+
+
