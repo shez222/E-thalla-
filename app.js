@@ -108,7 +108,7 @@ app.use((req, res, next) => {
   });
 
 // Start the Server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 const io = socketIo(3001, {
     cors: {
       origin: '*', // Allow all origins for now, you can specify your client domain here

@@ -373,6 +373,7 @@ const createShop = async (req, res) => {
             }
             locationData = { lat, lng };
         }
+console.log(location);
 
         // Create the Shop
         const shop = await Shop.create(

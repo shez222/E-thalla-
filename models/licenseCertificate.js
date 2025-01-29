@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     certificateId: { // Represents the unique identifier for the certificate
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     url: { // URL or path to the certificate image/file
       type: DataTypes.STRING,

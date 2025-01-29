@@ -21,7 +21,7 @@ module.exports = {
       },
       certificateId: { // Unique identifier for the certificate
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       url: { // URL or path to the certificate image/file
         type: Sequelize.STRING,
@@ -43,7 +43,7 @@ module.exports = {
     });
 
     // Add indexes if necessary
-    await queryInterface.addIndex('LicenseCertificates', ['shopId']);
+    // await queryInterface.addIndex('LicenseCertificates', ['shopId']);
   },
 
   down: async (queryInterface, Sequelize) => {

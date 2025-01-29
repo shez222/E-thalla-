@@ -20,8 +20,8 @@ module.exports = {
       },
       imageId: { // Unique Identifier for the Image (Optional)
         type: Sequelize.STRING,
-        allowNull: false,
-        unique: true // Ensures that each imageId is unique
+        allowNull: true,
+        // unique: true // Ensures that each imageId is unique
       },
       url: { // URL or Path to the Image
         type: Sequelize.STRING,
@@ -40,7 +40,7 @@ module.exports = {
     });
 
     // Add indexes to optimize queries
-    await queryInterface.addIndex('ProductImages', ['productId']);
+    // await queryInterface.addIndex('ProductImages', ['productId']);
     // await queryInterface.addIndex('ProductImages', ['imageId'], { unique: true });
   },
 

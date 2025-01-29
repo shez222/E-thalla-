@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     imageId: { // Renamed from 'id' to 'imageId' to avoid confusion
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     url: {
       type: DataTypes.STRING,
