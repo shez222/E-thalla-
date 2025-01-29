@@ -8,10 +8,41 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true
     },
-    // experience: {
-    //   type: DataTypes.STRING,
-    //   allowNull: false
-    // },
+    name: { // New Field
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    email: { // New Field
+      type: DataTypes.STRING,
+      allowNull: false,
+      // validate: {
+      //   isEmail: true
+      // }
+    },
+    phone: { // New Field
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    profilePicture: { // New Field
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        isUrl: true
+      }
+    },
+    location: { // New Field
+      type: DataTypes.JSON,
+      allowNull: true,
+      // Optionally, you can add a custom validator to ensure it has lat and lng
+      validate: {
+        isValidLocation(value) {
+          if (value && (typeof value.lat !== 'number' || typeof value.lng !== 'number')) {
+            throw new Error('Location must contain valid lat and lng as numbers.');
+          }
+        }
+      }
+    },
+    // ... existing fields
     specialization: {
       type: DataTypes.JSON,
       allowNull: false,
@@ -110,96 +141,3 @@ module.exports = (sequelize, DataTypes) => {
 
   return ServiceProviderDetail;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // const Sequelize = require('sequelize');
-// // const sequelizeDbConnect = require('../utils/db');
-
-// // const ServiceProviderDetail = sequelizeDbConnect.define('ServiceProviderDetails', {
-// //     serviceProviderDetailsId: {
-// //         type: Sequelize.INTEGER,
-// //         allowNull: false,
-// //         primaryKey: true,
-// //         autoIncrement: true
-// //     },
-// //     experience: {
-// //         type: Sequelize.STRING,
-// //         allowNull: false
-// //     },
-// //     specialization: {
-// //         type: Sequelize.STRING,
-// //         allowNull: false
-// //     },
-// //     availability: {
-// //         type: Sequelize.JSON, // Nested JSON structure for availability
-// //         allowNull: false
-// //     },
-// //     previousWorkImages: {
-// //         type: Sequelize.JSON, // Array of images stored as JSON
-// //         allowNull: true
-// //     },
-// //     certificateImages: {
-// //         type: Sequelize.JSON, // Array of certificates stored as JSON
-// //         allowNull: true
-// //     }
-// // });
-
-// // module.exports = ServiceProviderDetail;
-
-// module.exports = (sequelize,DataTypes)=> {
-//     const ServiceProviderDetail = sequelize.define('ServiceProviderDetail', {
-//         serviceProviderDetailsId: {
-//           type: DataTypes.INTEGER,
-//           allowNull: false,
-//           primaryKey: true,
-//           autoIncrement: true
-//         },
-//         experience: {
-//           type: DataTypes.STRING,
-//           allowNull: false
-//         },
-//         specialization: {
-//           type: DataTypes.STRING,
-//           allowNull: false
-//         },
-//         availability: {
-//           type: DataTypes.JSON,
-//           allowNull: false
-//         },
-//         previousWorkImages: {
-//           type: DataTypes.JSON,
-//           allowNull: true,
-//           defaultValue: []
-//         },
-//         certificateImages: {
-//           type: DataTypes.JSON,
-//           allowNull: true,
-//           defaultValue: []
-          
-//         }
-//       });
-      
-//       ServiceProviderDetail.associate = function(models) {
-//         ServiceProviderDetail.belongsTo(models.User, {
-//           foreignKey: 'userId',
-//           as: 'user'
-//         });
-//       };
-
-//       return ServiceProviderDetail;
-// }

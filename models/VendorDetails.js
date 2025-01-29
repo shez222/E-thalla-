@@ -33,6 +33,18 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.JSON,
         allowNull: false
       },
+      location: { // New Field
+        type: DataTypes.JSON,
+        allowNull: true,
+        // Optionally, you can add a custom validator to ensure it has lat and lng
+        validate: {
+          isValidLocation(value) {
+            if (value && (typeof value.lat !== 'number' || typeof value.lng !== 'number')) {
+              throw new Error('Location must contain valid lat and lng as numbers.');
+            }
+          }
+        }
+      },
     //   priceRange: {
     //     type: DataTypes.JSON,
     //     allowNull: false

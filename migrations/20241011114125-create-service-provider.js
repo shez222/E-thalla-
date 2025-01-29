@@ -9,10 +9,27 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true
       },
-      // experience: {
-      //   type: Sequelize.STRING,
-      //   allowNull: false
-      // },
+      name: { // New Field
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      email: { // New Field
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      phone: { // New Field
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      profilePicture: { // New Field
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      location: { // New Field
+        type: Sequelize.JSON,
+        allowNull: true
+      },
+      // ... existing fields
       specialization: {
         type: Sequelize.JSON,
         allowNull: false
@@ -105,7 +122,7 @@ module.exports = {
         allowNull: false,
         references: {
           model: 'Users', // Ensure this matches your actual Users table name
-          key: 'multiUserId'       // Ensure this matches the primary key in Users table
+          key: 'multiUserId' // Ensure this matches the primary key in Users table
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
@@ -121,12 +138,20 @@ module.exports = {
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       }
     });
+
+    // Optional: Add unique constraint on email if required
+    // await queryInterface.addConstraint('ServiceProviderDetails', {
+    //   fields: ['email'],
+    //   type: 'unique',
+    //   name: 'unique_email_constraint'
+    // });
   },
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('ServiceProviderDetails');
   }
 };
+
 
 
 

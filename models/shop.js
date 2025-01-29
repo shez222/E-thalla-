@@ -14,9 +14,17 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true
     },
-    location: { // Renamed from 'location' to 'shopLocation' if needed
-      type: DataTypes.STRING,
-      allowNull: true
+    location: { // New Field
+      type: DataTypes.JSON,
+      allowNull: true,
+      // Optionally, you can add a custom validator to ensure it has lat and lng
+      validate: {
+        isValidLocation(value) {
+          if (value && (typeof value.lat !== 'number' || typeof value.lng !== 'number')) {
+            throw new Error('Location must contain valid lat and lng as numbers.');
+          }
+        }
+      }
     },
     phone: { // New field
       type: DataTypes.STRING,
