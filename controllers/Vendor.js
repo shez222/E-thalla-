@@ -48,7 +48,7 @@ const createVendorDetail = async (req, res) => {
         // Check if a VendorDetail already exists for the given userId
         const existingVendor = await VendorDetail.findOne({ where: { userId } });
         if (existingVendor) {
-            return res.status(400).json({
+            return res.status(201).json({
                 message: 'A vendor detail already exists for this user.',
                 existingVendor: existingVendor // Return the existing vendor detail
             });

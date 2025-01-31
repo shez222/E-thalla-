@@ -55,7 +55,7 @@ const createServiceProviderDetail = async (req, res) => {
     // Check if a ServiceProviderDetail already exists for the given userId
     const existingServiceProvider = await ServiceProviderDetail.findOne({ where: { userId } });
     if (existingServiceProvider) {
-      return res.status(400).json({
+      return res.status(201).json({
         message: 'A service provider detail already exists for this user.',
         existingServiceProvider // Return the existing service provider detail
       });
