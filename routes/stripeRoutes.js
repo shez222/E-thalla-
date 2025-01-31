@@ -26,7 +26,7 @@ router.post('/', async (req, res) => {
         // Create a PaymentIntent with customer details
         const paymentIntent = await stripe.paymentIntents.create({
             amount: amount,
-            currency: 'usd',
+            currency: 'pkr',
             customer: customer.id,
             payment_method_types: ['card'],
             description: 'Purchase from your app',
@@ -38,11 +38,11 @@ router.post('/', async (req, res) => {
             shipping: {
                 name: username,
                 address: {
-                    line1: 'Default Address', // You should collect this from user
-                    city: 'Default City',
-                    state: 'Default State',
-                    postal_code: '12345',
-                    country: 'US'
+                    line1: 'Default Address', // Replace with actual user-provided address
+                    city: 'Karachi', // Example city in Pakistan
+                    state: 'Sindh', // Example state in Pakistan
+                    postal_code: '75500', // Example postal code in Pakistan
+                    country: 'PK' // Country code for Pakistan
                 }
             }
         });
