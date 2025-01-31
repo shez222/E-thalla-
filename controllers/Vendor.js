@@ -16,6 +16,43 @@ const LicenseCertificate = db.LicenseCertificate;
 const AvailabilityDay = db.AvailabilityDay;
 const ProductImage = db.ProductImage;
 
+
+
+
+
+const checkVendorByUserId = async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        if (!userId) {
+            return res.status(400).json({ message: "User ID is required." });
+        }
+
+        // Check if a VendorDetail exists for the given userId
+        const vendor = await VendorDetail.findOne({ where: { userId } });
+
+        if (!vendor) {
+            return res.status(404).json({
+                success: false,
+                message: "No vendor found for this user ID."
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Vendor found.",
+            data: vendor
+        });
+    } catch (error) {
+        console.error("Error checking vendor by user ID:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error.",
+            error: error.message
+        });
+    }
+};
+
 /**
  * ===============================
  * VendorDetail Controller Functions
@@ -901,6 +938,7 @@ module.exports = {
     getVendorDetailById,
     updateVendorDetail,
     deleteVendorDetail,
+    checkVendorByUserId,
 
     // Product Functions
     postAddProducts,

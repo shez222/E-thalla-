@@ -73,6 +73,8 @@ router.put(
 // Delete a shop by ID
 router.delete('/shop/:shopId', vendorController.deleteShop);
 
+router.get("/check/:userId", vendorController.checkVendorByUserId); 
+
 module.exports = router;
 
 
