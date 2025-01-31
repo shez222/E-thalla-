@@ -35,4 +35,7 @@ router.post('/:userId/wallet/add', MultiUserController.addWalletBalance);
 // Optional: Route to get user's wallet balance
 router.get('/:userId/wallet', MultiUserController.getWalletBalance);
 
+// Route to deduct balance from user's wallet
+router.post('/:userId/wallet/deduct', MultiUserController.deductWalletBalance);
+
 module.exports = router;

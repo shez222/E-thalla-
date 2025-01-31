@@ -444,7 +444,47 @@ const getWalletBalance = async (req, res) => {
     return res.status(500).json({ message: 'Internal server error.' });
   }
 };
-module.exports = {MultiuserRegister, MultiuserLogin, matchOtp, forgotPassword, verifyForgetCode, setNewPassword, getAllUsers, getUserById,deleteUser, updateUser, resendOtp, addWalletBalance, getWalletBalance};
+
+// Deduct Balance from User's Wallet
+const deductWalletBalance = async (req, res) => {
+    const { userId } = req.params;
+    const { amount } = req.body;
+  
+    // Input validation
+    if (amount === undefined || isNaN(amount) || amount <= 0) {
+      return res.status(400).json({ message: 'Invalid amount provided.' });
+    }
+  
+    try {
+      // Find the user
+      const user = await User.findByPk(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found.' });
+      }
+  
+      const currentBalance = parseFloat(user.walletBalance);
+      const deductionAmount = parseFloat(amount);
+  
+      // Check for sufficient balance
+      if (currentBalance < deductionAmount) {
+        return res.status(400).json({ message: 'Insufficient wallet balance.' });
+      }
+  
+      // Update the wallet balance
+      const newBalance = currentBalance - deductionAmount;
+      user.walletBalance = newBalance.toFixed(2);
+      await user.save();
+  
+      return res.status(200).json({
+        message: 'Wallet balance deducted successfully.',
+        walletBalance: user.walletBalance
+      });
+    } catch (error) {
+      console.error('Error deducting wallet balance:', error);
+      return res.status(500).json({ message: 'Internal server error.' });
+    }
+  };
+module.exports = {MultiuserRegister, MultiuserLogin, matchOtp, forgotPassword, verifyForgetCode, setNewPassword, getAllUsers, getUserById,deleteUser, updateUser, resendOtp, addWalletBalance, getWalletBalance, deductWalletBalance};
 
 
 
