@@ -159,27 +159,31 @@ io.on("connection", (socket) => {
         console.log("users: ",users);
         io.emit("getUsers", users);
     });
-
+    
     //send and get message
-    socket.on("sendMessage", ({ senderId, receiverId, text }) => {
-        const user = getUser(receiverId);
-        io.to(user.socketId).emit("getMessage", {
-            senderId,
-            text,
-        });
-    }); 
-    // ==========================
+    // socket.on("sendMessage", ({ senderId, receiverId, text }) => {
+        //     const user = getUser(receiverId);
+        //     io.to(user.socketId).emit("getMessage", {
+            //         senderId,
+            //         text,
+            //     });
+            // }); 
+            // ==========================
     socket.on("sendMessage", async ({ senderId, receiverId, text }) => {
         try {
+
+            console.log("sending message ",senderId, " - ",receiverId,"-",text);
             // Find or create a chat between sender and receiver
             let chat = await Chat.findOne({
                 where: { participants: { [Op.contains]: [senderId, receiverId] } },
             });
     
             if (!chat) {
+                console.log("chat doesnt exist");
+                
                 chat = await Chat.create({ participants: [senderId, receiverId] });
             }
-    
+            
             // Save the message in the database
             const message = await Message.create({
                 chatId: chat.id,
@@ -190,7 +194,7 @@ io.on("connection", (socket) => {
             });
             
             console.log("Message saved to DB:", message);
-
+            
             // Emit message to the receiver
             const user = getUser(receiverId);
             if (user) {
