@@ -52,6 +52,15 @@ const createServiceProviderDetail = async (req, res) => {
       });
     }
 
+    // Check if a ServiceProviderDetail already exists for the given userId
+    const existingServiceProvider = await ServiceProviderDetail.findOne({ where: { userId } });
+    if (existingServiceProvider) {
+      return res.status(400).json({
+        message: 'A service provider detail already exists for this user.',
+        existingServiceProvider // Return the existing service provider detail
+      });
+    }
+
     // Validate email format
     if (!isValidEmail(email)) {
       return res.status(400).json({ message: 'Invalid email format.' });
@@ -122,6 +131,114 @@ const createServiceProviderDetail = async (req, res) => {
     res.status(500).json({ message: 'Internal server error.', error: error.message });
   }
 };
+
+// const createServiceProviderDetail = async (req, res) => {
+//   try {
+//     const {
+//       name,
+//       email,
+//       phone,
+//       profilePicture,
+//       location,
+//       specialization,
+//       availability,
+//       previousWorkImages,
+//       certificateImages,
+//       hourlyRate,
+//       languagesSpoken,
+//       bio,
+//       socialLinks,
+//       serviceArea,
+//       paymentTerms,
+//       tools,
+//       certifications,
+//       emergencyServices,
+//       warranty,
+//       reviews,
+//       status,
+//       yearsInBusiness,
+//       preferredContactMethod,
+//       pastProjects,
+//       userId
+//     } = req.body;
+
+//     // Validate required fields
+//     if (!userId || !specialization || !availability || !name || !email || !phone) {
+//       return res.status(400).json({
+//         message: 'Missing required fields: userId, name, email, phone, specialization, or availability.'
+//       });
+//     }
+
+//     // Validate email format
+//     if (!isValidEmail(email)) {
+//       return res.status(400).json({ message: 'Invalid email format.' });
+//     }
+
+//     // Validate profilePicture URL if provided
+//     if (profilePicture && !isValidURL(profilePicture)) {
+//       return res.status(400).json({ message: 'Invalid profilePicture URL.' });
+//     }
+
+//     // Validate location object if provided
+//     if (location) {
+//       const { lat, lng } = location;
+//       if (typeof lat !== 'number' || typeof lng !== 'number') {
+//         return res.status(400).json({ message: 'Location must contain valid lat and lng as numbers.' });
+//       }
+//     }
+
+//     // Optional: Validate URLs in previousWorkImages and certificateImages
+//     const validateImageURLs = (images, fieldName) => {
+//       if (images && Array.isArray(images)) {
+//         for (const url of images) {
+//           if (!isValidURL(url)) {
+//             throw new Error(`Invalid URL in ${fieldName}: ${url}`);
+//           }
+//         }
+//       }
+//     };
+
+//     validateImageURLs(previousWorkImages, 'previousWorkImages');
+//     validateImageURLs(certificateImages, 'certificateImages');
+
+//     // Create ServiceProviderDetail
+//     const newServiceProviderDetail = await ServiceProviderDetail.create({
+//       name,
+//       email,
+//       phone,
+//       profilePicture,
+//       location,
+//       specialization,
+//       availability,
+//       previousWorkImages: previousWorkImages || [],
+//       certificateImages: certificateImages || [],
+//       hourlyRate,
+//       languagesSpoken: languagesSpoken || [],
+//       bio,
+//       socialLinks: socialLinks || {},
+//       serviceArea: serviceArea || [],
+//       paymentTerms,
+//       tools: tools || [],
+//       certifications: certifications || [],
+//       emergencyServices: emergencyServices || false,
+//       warranty,
+//       reviews: reviews || [],
+//       status: status || 'Active',
+//       yearsInBusiness,
+//       preferredContactMethod,
+//       pastProjects: pastProjects || [],
+//       userId
+//     });
+
+//     res.status(201).json({
+//       message: 'ServiceProviderDetail created successfully.',
+//       data: newServiceProviderDetail
+//     });
+//   } catch (error) {
+//     console.error('Error creating ServiceProviderDetail:', error);
+//     res.status(500).json({ message: 'Internal server error.', error: error.message });
+//   }
+// };
 
 // Get all ServiceProviderDetails
 const getAllServiceProviderDetails = async (req, res) => {
