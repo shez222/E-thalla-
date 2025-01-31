@@ -45,6 +45,15 @@ const createVendorDetail = async (req, res) => {
             return res.status(400).json({ message: 'Missing required fields.' });
         }
 
+        // Check if a VendorDetail already exists for the given userId
+        const existingVendor = await VendorDetail.findOne({ where: { userId } });
+        if (existingVendor) {
+            return res.status(400).json({
+                message: 'A vendor detail already exists for this user.',
+                existingVendor: existingVendor // Return the existing vendor detail
+            });
+        }
+
         // Validate location if provided
         let locationData = null;
         if (location) {
@@ -54,7 +63,6 @@ const createVendorDetail = async (req, res) => {
             }
             locationData = { lat, lng };
         }
-      
 
         // Process image URLs from request body
         const imagesArray = Array.isArray(images) ? images : [];
@@ -90,6 +98,73 @@ const createVendorDetail = async (req, res) => {
         res.status(500).json({ message: 'Internal server error.', error: error.message });
     }
 };
+
+
+// const createVendorDetail = async (req, res) => {
+//     try {
+//         const {
+//             name,
+//             email,
+//             serviceType,
+//             phoneNumber,
+//             description,
+//             selectedItems,
+//             images, // Array of image URLs
+//             certificateImages, // Array of certificate image URLs
+//             location, // { lat: Number, lng: Number }
+//             userId
+//         } = req.body;
+
+//         // Validate required fields
+//         if (!name || !email || !serviceType || !phoneNumber || !description || !selectedItems || !userId) {
+//             return res.status(400).json({ message: 'Missing required fields.' });
+//         }
+
+//         // Validate location if provided
+//         let locationData = null;
+//         if (location) {
+//             const { lat, lng } = location;
+//             if (typeof lat !== 'number' || typeof lng !== 'number') {
+//                 return res.status(400).json({ message: 'Invalid location format. "lat" and "lng" must be numbers.' });
+//             }
+//             locationData = { lat, lng };
+//         }
+      
+
+//         // Process image URLs from request body
+//         const imagesArray = Array.isArray(images) ? images : [];
+//         const certificateImagesArray = Array.isArray(certificateImages) ? certificateImages : [];
+
+//         // Parse selectedItems if it's a string
+//         let selectedItemsParsed;
+//         try {
+//             selectedItemsParsed = typeof selectedItems === 'string' ? JSON.parse(selectedItems) : selectedItems;
+//         } catch (parseError) {
+//             return res.status(400).json({ message: 'selectedItems must be a valid JSON object.' });
+//         }
+
+//         // Create VendorDetail
+//         const newVendorDetail = await VendorDetail.create({
+//             name,
+//             email,
+//             serviceType,
+//             phoneNumber,
+//             description,
+//             selectedItems: selectedItemsParsed,
+//             uploadImages: {
+//                 images: imagesArray,
+//                 certificateImages: certificateImagesArray
+//             },
+//             location: locationData,
+//             userId
+//         });
+
+//         res.status(201).json({ message: 'VendorDetail created successfully.', data: newVendorDetail });
+//     } catch (error) {
+//         console.error('Error creating VendorDetail:', error);
+//         res.status(500).json({ message: 'Internal server error.', error: error.message });
+//     }
+// };
 
 /**
  * Get All VendorDetails
