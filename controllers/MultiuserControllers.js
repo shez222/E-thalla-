@@ -387,8 +387,64 @@ const deleteUser = async (req, res) => {
     }
 };
 
+// controllers/userController.js
 
-module.exports = {MultiuserRegister, MultiuserLogin, matchOtp, forgotPassword, verifyForgetCode, setNewPassword, getAllUsers, getUserById,deleteUser, updateUser, resendOtp}
+const { User } = require('../models');
+
+// Add Balance to User's Wallet
+const addWalletBalance = async (req, res) => {
+  const { userId } = req.params;
+  const { amount } = req.body;
+
+  // Input validation
+  if (!amount || isNaN(amount) || amount <= 0) {
+    return res.status(400).json({ message: 'Invalid amount provided.' });
+  }
+
+  try {
+    // Find the user
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    // Update the wallet balance
+    const newBalance = parseFloat(user.walletBalance) + parseFloat(amount);
+    user.walletBalance = newBalance.toFixed(2);
+    await user.save();
+
+    return res.status(200).json({
+      message: 'Wallet balance updated successfully.',
+      walletBalance: user.walletBalance
+    });
+  } catch (error) {
+    console.error('Error updating wallet balance:', error);
+    return res.status(500).json({ message: 'Internal server error.' });
+  }
+};
+
+// Optional: Get User's Wallet Balance
+const getWalletBalance = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Find the user
+    const user = await User.findByPk(userId, {
+      attributes: ['walletBalance']
+    });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    return res.status(200).json({
+      walletBalance: user.walletBalance
+    });
+  } catch (error) {
+    console.error('Error fetching wallet balance:', error);
+    return res.status(500).json({ message: 'Internal server error.' });
+  }
+};
+module.exports = {MultiuserRegister, MultiuserLogin, matchOtp, forgotPassword, verifyForgetCode, setNewPassword, getAllUsers, getUserById,deleteUser, updateUser, resendOtp, addWalletBalance, getWalletBalance};
 
 
 

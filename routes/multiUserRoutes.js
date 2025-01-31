@@ -29,4 +29,10 @@ router.put('/users/:id', MultiUserController.updateUser);
 // Delete a user by ID
 router.delete('/users/:id', MultiUserController.deleteUser);
 
+// Route to add balance to user's wallet
+router.post('/:userId/wallet/add', MultiUserController.addWalletBalance);
+
+// Optional: Route to get user's wallet balance
+router.get('/:userId/wallet', MultiUserController.getWalletBalance);
+
 module.exports = router;

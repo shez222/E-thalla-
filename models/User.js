@@ -83,76 +83,159 @@
 
 // module.exports = MultiUser;
 
-module.exports = (sequelize,DataTypes) =>{
-    const User = sequelize.define('User', {
-        multiUserId: {
-          type: DataTypes.INTEGER,
-          autoIncrement: true,
-          allowNull: true,
-          primaryKey: true
-        },
-        password: {
-          type: DataTypes.STRING,
-          allowNull: false
-        },
-        email: {
-          type: DataTypes.STRING,
-          allowNull: false,
-          unique: true
-        },
-        userName: {
-          type: DataTypes.STRING,
-          allowNull: false
-        },
-        currentRole: {
-          type: DataTypes.JSON,
-          defaultValue: [],
-          allowNull: false
-        },
-        cnic: {
-          type: DataTypes.STRING,
-          allowNull: true
-        },
-        profilePicture: {
-          type: DataTypes.STRING,
-          allowNull: true
-        },
-        mobileNumber: {
-          type: DataTypes.STRING,
-          allowNull: true
-        },
-        otp: {
-          type: DataTypes.STRING,
-          allowNull: true
-        },
-        otpExpiry: {
-          type: DataTypes.STRING,
-          allowNull: true
-        },
-        resetPasswordToken: {
-          type: DataTypes.STRING,
-          allowNull: true
-        },
-        resetPasswordExpires: {
-          type: DataTypes.STRING,
-          allowNull: true
-        },
-        token: {
-          type: DataTypes.STRING,
-          allowNull: true
-        },
-        isVerified: {  // Adding the verification status field
-          type: DataTypes.INTEGER,
-          defaultValue: 0, // 0 = Not Verified, 1 = Verified
-          allowNull: false
-        }
-      });
+// module.exports = (sequelize,DataTypes) =>{
+//     const User = sequelize.define('User', {
+//         multiUserId: {
+//           type: DataTypes.INTEGER,
+//           autoIncrement: true,
+//           allowNull: true,
+//           primaryKey: true
+//         },
+//         password: {
+//           type: DataTypes.STRING,
+//           allowNull: false
+//         },
+//         email: {
+//           type: DataTypes.STRING,
+//           allowNull: false,
+//           unique: true
+//         },
+//         userName: {
+//           type: DataTypes.STRING,
+//           allowNull: false
+//         },
+//         currentRole: {
+//           type: DataTypes.JSON,
+//           defaultValue: [],
+//           allowNull: false
+//         },
+//         cnic: {
+//           type: DataTypes.STRING,
+//           allowNull: true
+//         },
+//         profilePicture: {
+//           type: DataTypes.STRING,
+//           allowNull: true
+//         },
+//         mobileNumber: {
+//           type: DataTypes.STRING,
+//           allowNull: true
+//         },
+//         otp: {
+//           type: DataTypes.STRING,
+//           allowNull: true
+//         },
+//         otpExpiry: {
+//           type: DataTypes.STRING,
+//           allowNull: true
+//         },
+//         resetPasswordToken: {
+//           type: DataTypes.STRING,
+//           allowNull: true
+//         },
+//         resetPasswordExpires: {
+//           type: DataTypes.STRING,
+//           allowNull: true
+//         },
+//         token: {
+//           type: DataTypes.STRING,
+//           allowNull: true
+//         },
+//         isVerified: {  // Adding the verification status field
+//           type: DataTypes.INTEGER,
+//           defaultValue: 0, // 0 = Not Verified, 1 = Verified
+//           allowNull: false
+//         }
+//       });
       
-      User.associate = function(models) {
-        User.hasOne(models.Cart, { foreignKey: 'userId', as: 'cart' });
-        // User.hasMany(models.Product, { foreignKey: 'userId', as: 'products' });
-        User.hasMany(models.Order, { foreignKey: 'userId', as: 'orders' });
-      };
+//       User.associate = function(models) {
+//         User.hasOne(models.Cart, { foreignKey: 'userId', as: 'cart' });
+//         // User.hasMany(models.Product, { foreignKey: 'userId', as: 'products' });
+//         User.hasMany(models.Order, { foreignKey: 'userId', as: 'orders' });
+//       };
       
-    return User;
-}
+//     return User;
+// }
+
+
+
+// models/user.js
+
+module.exports = (sequelize, DataTypes) => {
+  const User = sequelize.define('User', {
+    multiUserId: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      allowNull: false, // Changed from true to false since it's primary key
+      primaryKey: true
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true
+    },
+    userName: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    currentRole: {
+      type: DataTypes.JSON,
+      defaultValue: [],
+      allowNull: false
+    },
+    cnic: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    profilePicture: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    mobileNumber: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    otp: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    otpExpiry: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    resetPasswordToken: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    resetPasswordExpires: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    token: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    isVerified: {  
+      type: DataTypes.INTEGER,
+      defaultValue: 0, // 0 = Not Verified, 1 = Verified
+      allowNull: false
+    },
+    walletBalance: { // New Wallet Balance Field
+      type: DataTypes.DECIMAL(10, 2), // Adjust precision as needed
+      allowNull: false,
+      defaultValue: 0.00
+    }
+  });
+
+  User.associate = function(models) {
+    User.hasOne(models.Cart, { foreignKey: 'userId', as: 'cart' });
+    // User.hasMany(models.Product, { foreignKey: 'userId', as: 'products' });
+    User.hasMany(models.Order, { foreignKey: 'userId', as: 'orders' });
+  };
+
+  return User;
+};

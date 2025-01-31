@@ -73,6 +73,11 @@ module.exports = {
       //   onDelete: 'SET NULL',
       //   allowNull: true
       // },
+      walletBalance: { // New Wallet Balance Field
+        type: Sequelize.DECIMAL(10, 2), // Adjust precision as needed
+        allowNull: false,
+        defaultValue: 0.00
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false
