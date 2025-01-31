@@ -19,6 +19,7 @@ router.put('/serviceProviderDetails/:id', serviceProviderDetailController.update
 
 // Delete a ServiceProviderDetail by ID
 router.delete('/serviceProviderDetails/:id', serviceProviderDetailController.deleteServiceProviderDetail);
+router.get("/check/:userId", serviceProviderDetailController.checkServiceProviderByUserId); 
 
 module.exports = router;
 

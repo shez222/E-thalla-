@@ -13,7 +13,38 @@ const isValidURL = (url) => {
   const regex = /^(http|https):\/\/[^ "]+$/;
   return regex.test(url);
 };
+const checkServiceProviderByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
 
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required." });
+    }
+
+    // Check if a ServiceProviderDetail exists for the given userId
+    const serviceProvider = await ServiceProviderDetail.findOne({ where: { userId } });
+
+    if (!serviceProvider) {
+      return res.status(404).json({
+        success: false,
+        message: "No service provider found for this user ID."
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Service provider found.",
+      data: serviceProvider
+    });
+  } catch (error) {
+    console.error("Error checking service provider by user ID:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+      error: error.message
+    });
+  }
+};
 // Create a new ServiceProviderDetail
 const createServiceProviderDetail = async (req, res) => {
   try {
@@ -406,7 +437,8 @@ module.exports = {
   createServiceProviderDetail,
   updateServiceProviderDetail,
   getAllServiceProviderDetails,
-  getServiceProviderDetailById
+  getServiceProviderDetailById,
+  checkServiceProviderByUserId
 };
 
 
